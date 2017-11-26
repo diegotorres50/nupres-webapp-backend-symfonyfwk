@@ -54,11 +54,9 @@ CREATE TABLE `evoluciones` (
   `manejo_id` char(5) DEFAULT 'PE',
   `formula_id` char(5) DEFAULT 'PE',
   `fecha_evolucion` datetime DEFAULT NULL,
-  `peso_actual` decimal(3,1) DEFAULT '0.0' COMMENT 'Peso actual del paciente',
-  `kilocalorias_kilogramo_peso` decimal(10,0) DEFAULT '0',
-  `meta_volumen` int(11) DEFAULT '0',
-  `gramos_proteina_diaria` int(11) DEFAULT '0',
-  `volumen_infundido` int(11) DEFAULT '0',
+  `kilocalorias_kilogramo_peso` decimal(10,3) DEFAULT '1.000' COMMENT 'Este es un dato a criterio del profesional entre 0 y 50',
+  `volumen_infundido` int(11) DEFAULT '1' COMMENT 'Dato abierto',
+  `peso_actual` decimal(10,3) DEFAULT '1.000' COMMENT 'Peso actual del paciente',
   PRIMARY KEY (`id`,`ingreso_id`),
   KEY `fk_evoluciones_1_idx` (`ingreso_id`),
   KEY `fk_evoluciones_2` (`manejo_id`),
@@ -75,7 +73,7 @@ CREATE TABLE `evoluciones` (
 
 LOCK TABLES `evoluciones` WRITE;
 /*!40000 ALTER TABLE `evoluciones` DISABLE KEYS */;
-INSERT INTO `evoluciones` (`id`, `ingreso_id`, `manejo_id`, `formula_id`, `fecha_evolucion`, `peso_actual`, `kilocalorias_kilogramo_peso`, `meta_volumen`, `gramos_proteina_diaria`, `volumen_infundido`) VALUES (0000000002,2,'MD','PEN','2017-11-18 00:00:00',62.5,2877,300,56,50),(0000000003,2,'NE','PEN','2017-11-19 00:00:00',62.5,1402,200,45,100);
+INSERT INTO `evoluciones` (`id`, `ingreso_id`, `manejo_id`, `formula_id`, `fecha_evolucion`, `kilocalorias_kilogramo_peso`, `volumen_infundido`, `peso_actual`) VALUES (0000000002,2,'MD','ENS','2017-11-18 00:00:00',25.000,50,50.000),(0000000003,2,'NE','ENS','2017-11-19 00:00:00',25.000,100,50.000);
 /*!40000 ALTER TABLE `evoluciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,6 +102,8 @@ SET character_set_client = utf8;
  1 AS `seguimiento`,
  1 AS `motivo_egreso`,
  1 AS `evolucion_id`,
+ 1 AS `formula_kilocalorias_mililitro`,
+ 1 AS `formula_proteina_mililitro`,
  1 AS `ubicacion`,
  1 AS `cama`,
  1 AS `nacimiento`,
@@ -119,11 +119,11 @@ SET character_set_client = utf8;
  1 AS `kilocalorias_kilogramo_peso`,
  1 AS `meta_calorica`,
  1 AS `meta_volumen`,
+ 1 AS `volumen_infundido`,
+ 1 AS `cumplimiento_meta_volumen`,
  1 AS `gramos_proteina_diaria`,
  1 AS `gramos_proteina_kg_peso`,
- 1 AS `cumplimiento_meta_calorica`,
- 1 AS `volumen_infundido`,
- 1 AS `cumplimiento_meta_volumen`*/;
+ 1 AS `cumplimiento_meta_calorica`*/;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -139,9 +139,6 @@ CREATE TABLE `ingresos` (
   `fecha_ingreso` datetime DEFAULT NULL,
   `eps` varchar(45) DEFAULT NULL,
   `tipo_id` char(5) NOT NULL COMMENT 'Es el tipo de registro con el que se ingresa un paciente al sistema',
-  `talla` decimal(3,2) unsigned NOT NULL,
-  `media_envergadura` decimal(3,1) unsigned DEFAULT NULL,
-  `altura_rodilla` varchar(45) DEFAULT NULL,
   `fecha_mipres` date DEFAULT NULL,
   `fecha_egreso` datetime DEFAULT NULL,
   `motivo_egreso` char(5) DEFAULT 'PE',
@@ -164,7 +161,7 @@ CREATE TABLE `ingresos` (
 
 LOCK TABLES `ingresos` WRITE;
 /*!40000 ALTER TABLE `ingresos` DISABLE KEYS */;
-INSERT INTO `ingresos` (`id`, `paciente_id`, `fecha_ingreso`, `eps`, `tipo_id`, `talla`, `media_envergadura`, `altura_rodilla`, `fecha_mipres`, `fecha_egreso`, `motivo_egreso`, `observaciones`, `estado`, `seguimiento`) VALUES (0000000002,80123858,'2017-11-17 00:00:00','FAMISANAR','CC',1.68,23.0,'34','2017-11-11',NULL,'PE','NINGUNA','ACTIVO','S');
+INSERT INTO `ingresos` (`id`, `paciente_id`, `fecha_ingreso`, `eps`, `tipo_id`, `fecha_mipres`, `fecha_egreso`, `motivo_egreso`, `observaciones`, `estado`, `seguimiento`) VALUES (0000000002,80123858,'2017-11-17 00:00:00','FAMISANAR','CC','2017-11-11',NULL,'PE','NINGUNA','ACTIVO','S');
 /*!40000 ALTER TABLE `ingresos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -181,6 +178,9 @@ CREATE TABLE `pacientes` (
   `apellidos` varchar(100) NOT NULL COMMENT 'Apellidos del paciente',
   `genero` enum('F','M') NOT NULL COMMENT 'Genero del paciente',
   `fecha_nacimiento` date NOT NULL COMMENT 'Fecha de nacimiento del paciente',
+  `talla` decimal(3,2) unsigned NOT NULL,
+  `media_envergadura` decimal(3,1) unsigned DEFAULT NULL,
+  `altura_rodilla` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -191,7 +191,7 @@ CREATE TABLE `pacientes` (
 
 LOCK TABLES `pacientes` WRITE;
 /*!40000 ALTER TABLE `pacientes` DISABLE KEYS */;
-INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`) VALUES (80123858,'Diego','Torres','M','1981-06-17'),(125434455,'Mariana','Torres','F','2006-09-12');
+INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`) VALUES (80123858,'Diego','Torres','M','1981-06-17',1.68,NULL,NULL),(125434455,'Mariana','Torres','F','2006-09-12',1.68,NULL,NULL);
 /*!40000 ALTER TABLE `pacientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -253,6 +253,8 @@ DROP TABLE IF EXISTS `ref-formulas`;
 CREATE TABLE `ref-formulas` (
   `id` char(5) NOT NULL,
   `nombre` varchar(45) NOT NULL,
+  `kilocalorias_mililitro` decimal(3,2) DEFAULT NULL,
+  `proteina_mililitro` decimal(3,2) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -263,7 +265,7 @@ CREATE TABLE `ref-formulas` (
 
 LOCK TABLES `ref-formulas` WRITE;
 /*!40000 ALTER TABLE `ref-formulas` DISABLE KEYS */;
-INSERT INTO `ref-formulas` (`id`, `nombre`) VALUES ('CLI','Clinical'),('COM','Compact'),('DIB','Diben'),('ENS','Ensure'),('GLU','Glucerna'),('NEP','Nepro'),('PEN','Pendiente'),('PER','Perative');
+INSERT INTO `ref-formulas` (`id`, `nombre`, `kilocalorias_mililitro`, `proteina_mililitro`) VALUES ('CLI','Clinical',NULL,NULL),('COM','Compact',NULL,NULL),('DIB','Diben',NULL,NULL),('ENS','Ensure',1.50,6.75),('GLU','Glucerna',NULL,NULL),('NEP','Nepro',NULL,NULL),('PEN','Pendiente',NULL,NULL),('PER','Perative',NULL,NULL);
 /*!40000 ALTER TABLE `ref-formulas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -370,6 +372,31 @@ INSERT INTO `ubicaciones` (`refubicacion_id`, `evolucion_id`, `cama`, `fecha_ing
 UNLOCK TABLES;
 
 --
+-- Table structure for table `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userid` varchar(200) NOT NULL,
+  `nombre` varchar(45) DEFAULT NULL,
+  `password` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuarios`
+--
+
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Dumping routines for database 'nupres_dev_demo01'
 --
 /*!50003 DROP FUNCTION IF EXISTS `fxCubrimientoMetaCalorica` */;
@@ -382,7 +409,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fxCubrimientoMetaCalorica`(`aporte_kilocalorias_24h` INT, `meta_calorica` INT) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXCUBRIMIENTOMETACALORICA`(`aporte_kilocalorias_24h` INT, `meta_calorica` INT) RETURNS decimal(10,0)
 BEGIN
 
 	/* Calcula el cubrimiento porcentual de la meta calorica del paciente */ 
@@ -406,7 +433,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fxCubrimientoMetaVolumen`(`meta_volumen` INT, `volumen_infundido_24h` INT) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXCUBRIMIENTOMETAVOLUMEN`(`meta_volumen` INT, `volumen_infundido_24h` INT) RETURNS decimal(10,0)
 BEGIN
 
 	/* Calcula el cubrimiento porcentual de la meta calorica del paciente */ 
@@ -430,7 +457,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fxGastoEnergeticoBasal`(`peso_actual` DECIMAL, `talla` DECIMAL, `edad` INT) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXGASTOENERGETICOBASAL`(`peso_actual` DECIMAL, `talla` DECIMAL, `edad` INT) RETURNS decimal(10,0)
 BEGIN
 
 	/* Calcula el gasto energetico basal del paciente*/ 
@@ -448,6 +475,29 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `FxGramosProteinaDiaria` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXGRAMOSPROTEINADIARIA`(`meta_volumen` int, `proteina_mililitro` decimal(10,3)) RETURNS int(11)
+    DETERMINISTIC
+BEGIN
+
+/* Calcula la meta volumen del paciente*/
+RETURN ((`meta_volumen` * `proteina_mililitro`) / 100);
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP FUNCTION IF EXISTS `fxGramosProteinaKgPeso` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -458,7 +508,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fxGramosProteinaKgPeso`(`gramos_proteina_diaria` INT, `peso_actual` DECIMAL) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXGRAMOSPROTEINAKGPESO`(`gramos_proteina_diaria` INT, `peso_actual` DECIMAL) RETURNS decimal(10,0)
 BEGIN
 
 /* Calcula los calcula los gramos de proteina por kg de peso del paciente*/ 
@@ -480,7 +530,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fxIndiceMasaCorporal`(`peso_actual` DECIMAL, `talla` DECIMAL) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXINDICEMASACORPORAL`(`peso_actual` DECIMAL, `talla` DECIMAL) RETURNS decimal(10,0)
 BEGIN
 
 /* Calcula el indice de masa corporal del paciente*/ 
@@ -524,13 +574,36 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fxMetaCalorica`(`kilocalorias_kilogramo_peso` INT, `peso` DECIMAL) RETURNS int(11)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXMETACALORICA`(`kilocalorias_kilogramo_peso` INT, `peso` DECIMAL) RETURNS int(11)
     DETERMINISTIC
 BEGIN
 
 /* Calcula la meta calorica del paciente*/ 
 
 RETURN (`kilocalorias_kilogramo_peso` * `peso`);
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `FxMetaVolumen` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXMETAVOLUMEN`(`kilocalorias_kilogramo_peso` int, `peso` decimal(10,3), `kilocalorias_mililitro` decimal(10,3)) RETURNS int(11)
+    DETERMINISTIC
+BEGIN
+
+/* Calcula la meta volumen del paciente*/
+RETURN ((`kilocalorias_kilogramo_peso` * `peso`) / `kilocalorias_mililitro`);
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -551,7 +624,7 @@ DELIMITER ;
 /*!50001 SET collation_connection      = utf8_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `informe_cuidado_critico_general` AS select `ingresos`.`id` AS `ingreso_cod`,`ingresos`.`paciente_id` AS `paciente_doc`,`pacientes`.`nombres` AS `paciente_nombres`,`pacientes`.`apellidos` AS `paciente_apellidos`,`ingresos`.`fecha_ingreso` AS `ingreso`,(to_days(now()) - to_days(`ingresos`.`fecha_ingreso`)) AS `dias_ingreso`,`ingresos`.`fecha_mipres` AS `fecha_mipres`,(to_days(now()) - to_days(`ingresos`.`fecha_mipres`)) AS `dias_mipres`,`ingresos`.`media_envergadura` AS `media_envergadura`,`ingresos`.`altura_rodilla` AS `altura_rodilla`,`ingresos`.`fecha_egreso` AS `fecha_egreso`,`ingresos`.`observaciones` AS `observaciones`,`ingresos`.`estado` AS `estado`,`ingresos`.`seguimiento` AS `seguimiento`,`ref-egresos`.`nombre` AS `motivo_egreso`,`evoluciones`.`id` AS `evolucion_id`,`ref-ubicaciones`.`nombre` AS `ubicacion`,`ubicaciones`.`cama` AS `cama`,`pacientes`.`fecha_nacimiento` AS `nacimiento`,(year(now()) - year(`pacientes`.`fecha_nacimiento`)) AS `edad`,`pacientes`.`genero` AS `sexo`,`ingresos`.`eps` AS `eps`,`ref-manejos`.`nombre` AS `manejo`,`ref-formulas`.`nombre` AS `formula`,`evoluciones`.`peso_actual` AS `peso`,`ingresos`.`talla` AS `talla`,`fxGastoEnergeticoBasal`(`evoluciones`.`peso_actual`,`ingresos`.`talla`,(year(now()) - year(`pacientes`.`fecha_nacimiento`))) AS `gasto_energetico_basal`,`fxIndiceMasaCorporal`(`evoluciones`.`peso_actual`,`ingresos`.`talla`) AS `indice_masa_corporal`,`evoluciones`.`kilocalorias_kilogramo_peso` AS `kilocalorias_kilogramo_peso`,`fxMetaCalorica`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`) AS `meta_calorica`,`evoluciones`.`meta_volumen` AS `meta_volumen`,`evoluciones`.`gramos_proteina_diaria` AS `gramos_proteina_diaria`,`fxGramosProteinaKgPeso`(`evoluciones`.`gramos_proteina_diaria`,`evoluciones`.`peso_actual`) AS `gramos_proteina_kg_peso`,`fxCubrimientoMetaCalorica`(`evoluciones`.`gramos_proteina_diaria`,`fxMetaCalorica`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`)) AS `cumplimiento_meta_calorica`,`evoluciones`.`volumen_infundido` AS `volumen_infundido`,`fxCubrimientoMetaVolumen`(`evoluciones`.`meta_volumen`,`evoluciones`.`volumen_infundido`) AS `cumplimiento_meta_volumen` from (((((((`ingresos` join `pacientes`) join `evoluciones`) join `ref-ubicaciones`) join `ubicaciones`) join `ref-manejos`) join `ref-formulas`) join `ref-egresos`) where ((`ingresos`.`paciente_id` = `pacientes`.`id`) and (`evoluciones`.`ingreso_id` = `ingresos`.`id`) and (`ubicaciones`.`evolucion_id` = `evoluciones`.`id`) and (`ref-ubicaciones`.`id` = `ubicaciones`.`refubicacion_id`) and (`ref-manejos`.`id` = `evoluciones`.`manejo_id`) and (`ref-formulas`.`id` = `evoluciones`.`formula_id`) and (`ref-egresos`.`id` = `ingresos`.`motivo_egreso`) and (`ingresos`.`id` > 0)) order by `evoluciones`.`fecha_evolucion` desc */;
+/*!50001 VIEW `informe_cuidado_critico_general` AS select `ingresos`.`id` AS `ingreso_cod`,`ingresos`.`paciente_id` AS `paciente_doc`,`pacientes`.`nombres` AS `paciente_nombres`,`pacientes`.`apellidos` AS `paciente_apellidos`,`ingresos`.`fecha_ingreso` AS `ingreso`,(to_days(now()) - to_days(`ingresos`.`fecha_ingreso`)) AS `dias_ingreso`,`ingresos`.`fecha_mipres` AS `fecha_mipres`,(to_days(now()) - to_days(`ingresos`.`fecha_mipres`)) AS `dias_mipres`,`pacientes`.`media_envergadura` AS `media_envergadura`,`pacientes`.`altura_rodilla` AS `altura_rodilla`,`ingresos`.`fecha_egreso` AS `fecha_egreso`,`ingresos`.`observaciones` AS `observaciones`,`ingresos`.`estado` AS `estado`,`ingresos`.`seguimiento` AS `seguimiento`,`ref-egresos`.`nombre` AS `motivo_egreso`,`evoluciones`.`id` AS `evolucion_id`,`ref-formulas`.`kilocalorias_mililitro` AS `formula_kilocalorias_mililitro`,`ref-formulas`.`proteina_mililitro` AS `formula_proteina_mililitro`,`ref-ubicaciones`.`nombre` AS `ubicacion`,`ubicaciones`.`cama` AS `cama`,`pacientes`.`fecha_nacimiento` AS `nacimiento`,(year(now()) - year(`pacientes`.`fecha_nacimiento`)) AS `edad`,`pacientes`.`genero` AS `sexo`,`ingresos`.`eps` AS `eps`,`ref-manejos`.`nombre` AS `manejo`,`ref-formulas`.`nombre` AS `formula`,`evoluciones`.`peso_actual` AS `peso`,`pacientes`.`talla` AS `talla`,`FXGASTOENERGETICOBASAL`(`evoluciones`.`peso_actual`,`pacientes`.`talla`,(year(now()) - year(`pacientes`.`fecha_nacimiento`))) AS `gasto_energetico_basal`,`FXINDICEMASACORPORAL`(`evoluciones`.`peso_actual`,`pacientes`.`talla`) AS `indice_masa_corporal`,`evoluciones`.`kilocalorias_kilogramo_peso` AS `kilocalorias_kilogramo_peso`,`FXMETACALORICA`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`) AS `meta_calorica`,`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`) AS `meta_volumen`,`evoluciones`.`volumen_infundido` AS `volumen_infundido`,`FXCUBRIMIENTOMETAVOLUMEN`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`evoluciones`.`volumen_infundido`) AS `cumplimiento_meta_volumen`,`FXGRAMOSPROTEINADIARIA`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`ref-formulas`.`proteina_mililitro`) AS `gramos_proteina_diaria`,`FXGRAMOSPROTEINAKGPESO`(`FXGRAMOSPROTEINADIARIA`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`ref-formulas`.`proteina_mililitro`),`evoluciones`.`peso_actual`) AS `gramos_proteina_kg_peso`,`FXCUBRIMIENTOMETACALORICA`(`FXGRAMOSPROTEINADIARIA`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`ref-formulas`.`proteina_mililitro`),`FXMETACALORICA`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`)) AS `cumplimiento_meta_calorica` from (((((((`ingresos` join `pacientes`) join `evoluciones`) join `ref-ubicaciones`) join `ubicaciones`) join `ref-manejos`) join `ref-formulas`) join `ref-egresos`) where ((`ingresos`.`paciente_id` = `pacientes`.`id`) and (`evoluciones`.`ingreso_id` = `ingresos`.`id`) and (`ubicaciones`.`evolucion_id` = `evoluciones`.`id`) and (`ref-ubicaciones`.`id` = `ubicaciones`.`refubicacion_id`) and (`ref-manejos`.`id` = `evoluciones`.`manejo_id`) and (`ref-formulas`.`id` = `evoluciones`.`formula_id`) and (`ref-egresos`.`id` = `ingresos`.`motivo_egreso`) and (`ingresos`.`id` > 0)) order by `evoluciones`.`fecha_evolucion` desc */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -565,4 +638,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-11-19 18:30:13
+-- Dump completed on 2017-11-26 12:54:47

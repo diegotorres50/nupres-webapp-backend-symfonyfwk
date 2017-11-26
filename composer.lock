@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b740b8484e862a1be4901fe96568257b",
-    "content-hash": "354eb067f29b3f836aed387962bb89a3",
+    "hash": "34fc8a1b9f1afe93ae114fe29c38cf0c",
+    "content-hash": "842adaab0045ca0d2bee7a12f76ca5af",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -860,6 +860,51 @@
                 "sql"
             ],
             "time": "2014-01-12 16:20:24"
+        },
+        {
+            "name": "joshcam/mysqli-database-class",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ThingEngineer/PHP-MySQLi-Database-Class.git",
+                "reference": "39d06d95ad6cc7ee32de123358fb6dffdce1dbb2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ThingEngineer/PHP-MySQLi-Database-Class/zipball/39d06d95ad6cc7ee32de123358fb6dffdce1dbb2",
+                "reference": "39d06d95ad6cc7ee32de123358fb6dffdce1dbb2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "MysqliDb.php",
+                    "dbObject.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Campbell",
+                    "email": "josh.lee.campbell@gmail.com",
+                    "homepage": "https://github.com/joshcam",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Alexander V. Butenko",
+                    "email": "a.butenka@gmail.com",
+                    "homepage": "http://smarttechdo.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP MySQL Wrapper and object mapper which utilizes MySQLi and prepared statements",
+            "time": "2017-11-20 14:02:14"
         },
         {
             "name": "monolog/monolog",
@@ -2220,7 +2265,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "joshcam/mysqli-database-class": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
