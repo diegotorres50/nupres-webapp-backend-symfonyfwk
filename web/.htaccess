@@ -1,3 +1,6 @@
+# Debido a restricciones de servergrove.com debo hacer el set de mi zona horaria
+php_value date.timezone 'America/Bogota'
+
 # Use the front controller as index file. It serves as a fallback solution when
 # every other rewrite/redirect fails (e.g. in an aliased environment without
 # mod_rewrite). Additionally, this reduces the matching process for the
