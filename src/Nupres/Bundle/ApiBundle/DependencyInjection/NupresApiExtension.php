@@ -26,11 +26,11 @@ class NupresApiExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        print_r($config); die;
-
-        //$def = $container->getDefinition('nupres.api.twitter_client');
-        //$def->replaceArgument(0, $config['twitter']['client_id']);
-        //$def->replaceArgument(1, $config['twitter']['client_secret']);
+        // Con esto recorremos el config de configuration.php para setear
+        // en el contenedor los parametros del bundle y usarlos con getParameter() desde el container
+        foreach ($config as $key => $value) {
+            $container->setParameter('nupres_config.'.$key, $value);
+        }
     }
 
     public function getAlias()

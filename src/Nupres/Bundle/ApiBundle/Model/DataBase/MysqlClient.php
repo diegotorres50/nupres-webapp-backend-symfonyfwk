@@ -4,6 +4,8 @@ namespace Nupres\Bundle\ApiBundle\Model\DataBase;
 
 use \MysqliDb;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 class MysqlClient
 {
 
@@ -15,19 +17,19 @@ class MysqlClient
     Get an instance of the Mysql
     @return Instance
     */
-    public static function getInstance($arguments = [])
+    public static function getInstance(ContainerInterface $container = null, $arguments = [])
     {
         if (!self::$_instance) { // If no instance then make one
-            self::$_instance = new self($arguments);
+            self::$_instance = new self($container, $arguments);
         }
 
         return self::$_instance;
     }
 
-    public function __construct($arguments = [])
+    public function __construct(ContainerInterface $container = null, $arguments = [])
     {
         try {
-            $this->_client = new MysqliDb('localhost', 'root', '123456', 'nupres_dev_demo01');
+            $this->_client = new MysqliDb($container->getParameter('database_host'), $container->getParameter('database_user'), $container->getParameter('database_password'), 'nupres_dev_demo01');
         } catch (\Exception $ex) {
             throw $ex;
         }

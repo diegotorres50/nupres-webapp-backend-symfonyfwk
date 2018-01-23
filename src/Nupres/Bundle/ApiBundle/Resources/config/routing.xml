@@ -6,7 +6,7 @@
   <route id="add" path="/add">
     <default key="_controller">NupresApiBundle:User:add</default>
   </route>
-  <route id="nupres_api_security_login" path="/security/login">
+  <route id="nupres_api_security_login" path="/security/login" methods="POST">
     <default key="_controller">NupresApiBundle:Security:login</default>
   </route>
   <route id="nupres_api_security_logout" path="/security/logout">
