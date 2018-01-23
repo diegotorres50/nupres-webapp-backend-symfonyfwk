@@ -27,7 +27,7 @@ class MysqlClient
     public function __construct($arguments = [])
     {
         try {
-            $this->_client = new MysqliDb('localhost', 'nupre_dev_demo01', '123456', 'nupresco_dev_demo01');
+            $this->_client = new MysqliDb('localhost', 'root', '123456', 'nupres_dev_demo01');
         } catch (\Exception $ex) {
             throw $ex;
         }
