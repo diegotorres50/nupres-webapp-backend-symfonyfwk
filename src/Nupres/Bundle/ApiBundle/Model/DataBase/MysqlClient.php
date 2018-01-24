@@ -13,6 +13,14 @@ class MysqlClient
 
     private static $_instance; // The singleton instance
 
+    private $_dbHost;
+
+    private $_dbUser;
+
+    private $_dbPass;
+
+    private $_dbName;
+
     /*
     Get an instance of the Mysql
     @return Instance
@@ -29,7 +37,22 @@ class MysqlClient
     public function __construct(ContainerInterface $container = null, $arguments = [])
     {
         try {
-            $this->_client = new MysqliDb($container->getParameter('database_host'), $container->getParameter('database_user'), $container->getParameter('database_password'), 'nupres_dev_demo01');
+            $this->_dbHost = $container->getParameter('database_host');
+            $this->_dbUser = $container->getParameter('database_user');
+            $this->_dbPass = $container->getParameter('database_password');
+
+            $factoriesMapService = $container->get('nupres.factories_map.service');
+            $factoriesMap = $factoriesMapService::getFactoriesMap();
+
+            // Como persistir esto que no sea session
+            $this->_dbName = $factoriesMap[strtoupper($arguments['database'])];
+
+            $this->_client = new MysqliDb(
+                $this->_dbHost,
+                $this->_dbUser,
+                $this->_dbPass,
+                $this->_dbName
+            );
         } catch (\Exception $ex) {
             throw $ex;
         }

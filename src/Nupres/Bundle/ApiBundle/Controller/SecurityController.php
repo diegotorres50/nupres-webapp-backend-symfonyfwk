@@ -6,7 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-use Nupres\Bundle\ApiBundle\Model\DataBase\MysqlClient;
+use Nupres\Bundle\ApiBundle\Model\Security\Auth;
+
+use Nupres\Bundle\ApiBundle\Entity\Factories;
 
 class SecurityController extends Controller
 {
@@ -22,7 +24,7 @@ class SecurityController extends Controller
             // Obtenemos por post los valores de conexion
             $username = trim($request->request->get('username', null));
             $password = trim($request->request->get('password', null));
-            $database = trim($request->request->get('database', null));
+            $database = trim($request->request->get('factory', null));
 
             // Construimos parcialmente la respuesta
             $feedback['entry'] = $request->request->all();
@@ -43,7 +45,7 @@ class SecurityController extends Controller
             if (!empty($database)) {
                 $params['database'] = $database;
             } else {
-                throw new \Exception("database no fue encontrado");
+                throw new \Exception("factory no fue encontrado");
             }
 
             /*
@@ -63,30 +65,17 @@ class SecurityController extends Controller
             /*
             $feed = $request->query->get('feed', 'mundo-internacional');
             $section = $request->query->get('section', 'internacional');
+            */
 
             // Levantamos el servicio de importacion para acceder a un metodo especifico
             // que nos devuelve el json del feed
-            $importerService = new Importer(
-                $this->container,
-                $this->get('logger'),
-                $this->get('wfcms_xalok.importer_service')
-            );*/
+            $authService = new Auth($this->container, $params);
+            $login = $authService->login($params);
 
+            //$companiesMapService = $this->container->get('nupres.companies_map');
+            //$companiesMapService = Factories::getFactoriesMap();
 
-            /*if (array_key_exists('username', $bodyParams) &&
-              !empty($bodyParams['username']) &&
-              !is_null($bodyParams['username'])) {
-                $params['username'] = $bodyParams['username'];
-            } else {
-                throw new Exception("usename no esta definido");
-            }
-            if (array_key_exists('password', $bodyParams) &&
-              !empty($bodyParams['password']) &&
-              !is_null($bodyParams['password'])) {
-                $params['password'] = $bodyParams['password'];
-            } else {
-                throw new Exception("password no esta definido");
-            }*/
+            print_r($login); die;
 
             //Si la sesion ya existe, no mostramos el formulario de login
             if ($request->getSession()->has($username) &&
