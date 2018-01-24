@@ -48,34 +48,8 @@ class SecurityController extends Controller
                 throw new \Exception("factory no fue encontrado");
             }
 
-            /*
-            // Obtenemos del contenedor de servicios el mapeo de secciones etce vs feeds de bbc news
-            $feedsAliasService = $this->container->get('etce_bbcnews.feeds_alias');
-
-            // Retorna la lista de secciones como key y alias de feeds como valor
-            $feedsAlias = array (
-                'bundle_entity_sections_feeds' => $feedsAliasService::getFeedsMap(),
-                'xalok_config_sections_feeds' => $this->container->getParameter('bbc_news_feeds_vs_etce_sections'),
-                'xalok_config_gallery_feed_section_default' => $this->container->getParameter('bbc_news_gallery_feed_section_default'),
-                'xalok_config_page_article_class' => $this->container->getParameter('bbc_news_page_article_class')
-            );
-             */
-
-            // retrieve GET and POST variables respectively
-            /*
-            $feed = $request->query->get('feed', 'mundo-internacional');
-            $section = $request->query->get('section', 'internacional');
-            */
-
-            // Levantamos el servicio de importacion para acceder a un metodo especifico
-            // que nos devuelve el json del feed
             $authService = new Auth($this->container, $params);
             $login = $authService->login($params);
-
-            //$companiesMapService = $this->container->get('nupres.companies_map');
-            //$companiesMapService = Factories::getFactoriesMap();
-
-            print_r($login); die;
 
             //Si la sesion ya existe, no mostramos el formulario de login
             if ($request->getSession()->has($username) &&
@@ -88,24 +62,13 @@ class SecurityController extends Controller
                 print_r('no tenia session y se le ha creado la session: ' . $session->getName());
             }
 
-            //die;
-
-            //$_mysqlClient = MysqlClient::getInstance(array());
-            //$_results = $_mysqlClient->rawQuery('SELECT * FROM informe_cuidado_critico_general;');
-            //$feedback['entry'] = $request->query->all();
             $feedback['status'] = 1;
             $feedback['code'] = 200;
-            $feedback['data'] = 'TODOS LOS DATOS';
+            $feedback['data'] = $login;
 
             $response = new Response();
             $response->setContent(json_encode($feedback));
             $response->headers->set('Content-Type', 'application/json');
-            /*
-            $response = new Response(json_encode($result));
-
-            $response->headers->set('Content-Type', 'application/json');
-            */
-
 
             return $response;
         } catch (\Exception $e) {
