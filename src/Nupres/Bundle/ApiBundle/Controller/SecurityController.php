@@ -10,8 +10,6 @@ use Nupres\Bundle\ApiBundle\Model\Security\Auth;
 
 use Nupres\Bundle\ApiBundle\Entity\Factories;
 
-use Nupres\Bundle\ApiBundle\Model\Security\JWToken;
-
 class SecurityController extends Controller
 {
     public function loginAction(Request $request)
@@ -50,34 +48,48 @@ class SecurityController extends Controller
                 throw new \Exception("factory no fue encontrado");
             }
 
-            $jwt = JWToken::encode([
-        'id' => 1,
-        'name' => 'Eduardo'
-    ]);
-
-            var_dump($jwt);
-
-            var_dump(JWToken::decode($jwt, 'Sdw1s9x8@'));
-
-            die;
-
             $authService = new Auth($this->container, $params);
-            $login = $authService->login($params);
+            $userData = $authService->login($params);
 
-            //Si la sesion ya existe, no mostramos el formulario de login
-            if ($request->getSession()->has($username) &&
-                !empty($request->getSession()->has($username))) {
-                print_r('ya tiene una session');
+            if (is_array($userData) and !empty($userData)) {
+                $userData = $userData[0];
+                $jwTokenService = $this->container->get('nupres.jwt.service');
+                $data = $jwTokenService::encode(
+                    array_merge(
+                        $userData,
+                        array('time' => time())
+                    )
+                );
+                $userHash = $jwTokenService::encode(
+                    array(
+                        'database' => $database,
+                        'username' => $username,
+                        'time' => time()
+                    )
+                );
+
+                //Si la sesion ya existe, no mostramos el formulario de login
+                if ($request->getSession()->has($database . '.' . $username) &&
+                    !empty($request->getSession()->has($database . '.' . $username))) {
+                    //La session ya existia
+                } else {
+                    // Creamos la session
+                    $session=$request->getSession();
+                    $session->set($database . '.' . $username, $userData);
+                    $session->set("database", $database);
+                }
             } else {
-                $session=$request->getSession();
-                $session->set($username, "user data");
-                $session->set("database", $database);
-                print_r('no tenia session y se le ha creado la session: ' . $session->getName());
+                throw new \Exception("usuario o clave invalida");
             }
 
             $feedback['status'] = 1;
             $feedback['code'] = 200;
-            $feedback['data'] = $login;
+            $feedback['data']['jwt'] = $data;
+            $feedback['data']['user_hash'] = $userHash;
+            $feedback['data']['session'] = array(
+                'id' => $request->getSession()->getId(),
+                'name' => $request->getSession()->getName()
+            );
 
             $response = new Response();
             $response->setContent(json_encode($feedback));
@@ -150,5 +162,67 @@ class SecurityController extends Controller
 
 
         return $response;
+    }
+
+    public function jwtDecodeAction(Request $request)
+    {
+        // Respuesta a entregar
+        $feedback = array();
+
+        // Parametros para hacer el login
+        $params = array();
+
+        try {
+            // Obtenemos por post los valores de conexion
+            $token = trim($request->request->get('token', null));
+
+            $secretKey = trim($request->request->get('secret_key', null));
+
+            // Construimos parcialmente la respuesta
+            $feedback['entry'] = $request->request->all();
+
+            // Validamos datos de entrada
+            if (empty($token)) {
+                throw new \Exception("token no fue encontrado");
+            }
+
+            if (empty($secretKey)) {
+                throw new \Exception("secret_key no fue encontrado");
+            }
+
+            $jwTokenService = $this->container->get('nupres.jwt.service');
+
+            $data = $jwTokenService::decode($token, $secretKey);
+
+            $feedback['status'] = 1;
+            $feedback['code'] = 200;
+            $feedback['data'] = $data;
+
+            $response = new Response();
+            $response->setContent(json_encode($feedback));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        } catch (\Exception $e) {
+            $feedback['status'] = 0;
+            $feedback['code'] = 400;
+            $feedback['data'] = null;
+            $feedback['error'] = array();
+            $feedback['error']['code'] = $e->getCode();
+            $feedback['error']['message'] = $e->getMessage();
+            $feedback['error']['line'] = $e->getLine();
+            $feedback['error']['file'] = $e->getFile();
+            $feedback['error']['method'] = __METHOD__;
+            $feedback['error']['trace'] = $e->__toString();
+
+            // Respondemos un error controlado
+            return new Response(
+                json_encode($feedback),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+        }
     }
 }

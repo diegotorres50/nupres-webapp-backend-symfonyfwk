@@ -15,4 +15,7 @@
   <route id="nupres_api_security_isloggedin" path="/security/isloggedin">
     <default key="_controller">NupresApiBundle:Security:isloggedin</default>
   </route>
+  <route id="nupres_api_security_jwt_decode" path="/security/jwt/decode" methods="POST">
+    <default key="_controller">NupresApiBundle:Security:jwtDecode</default>
+  </route>
 </routes>

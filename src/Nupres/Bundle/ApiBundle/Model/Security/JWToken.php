@@ -11,7 +11,7 @@ use \Firebase\JWT\JWT;
 
 class JWToken
 {
-    private static $secretKey = 'Sdw1s9x8@';
+    private static $secretKey = 'nupres';
     private static $encrypt = ['HS256'];
     private static $iss = 'nupres.com.co';
     private static $aud = 'nupres.com.co';
