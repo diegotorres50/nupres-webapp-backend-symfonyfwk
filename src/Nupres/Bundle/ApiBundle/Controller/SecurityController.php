@@ -10,6 +10,8 @@ use Nupres\Bundle\ApiBundle\Model\Security\Auth;
 
 use Nupres\Bundle\ApiBundle\Entity\Factories;
 
+use Nupres\Bundle\ApiBundle\Model\Security\JWToken;
+
 class SecurityController extends Controller
 {
     public function loginAction(Request $request)
@@ -47,6 +49,17 @@ class SecurityController extends Controller
             } else {
                 throw new \Exception("factory no fue encontrado");
             }
+
+            $jwt = JWToken::encode([
+        'id' => 1,
+        'name' => 'Eduardo'
+    ]);
+
+            var_dump($jwt);
+
+            var_dump(JWToken::decode($jwt, 'Sdw1s9x8@'));
+
+            die;
 
             $authService = new Auth($this->container, $params);
             $login = $authService->login($params);

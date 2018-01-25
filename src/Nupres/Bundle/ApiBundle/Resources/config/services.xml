@@ -6,10 +6,13 @@
 
     <parameters>
         <parameter key="nupres.factories_map.class">Nupres\Bundle\ApiBundle\Entity\Factories</parameter>
+        <parameter key="nupres.jwt.class">Nupres\Bundle\ApiBundle\Model\Security\JWToken</parameter>
     </parameters>
 
     <services>
         <service id="nupres.factories_map.service" class="%nupres.factories_map.class%">
+        </service>
+        <service id="nupres.jwt.service" class="%nupres.jwt.class%">
         </service>
     </services>
 
