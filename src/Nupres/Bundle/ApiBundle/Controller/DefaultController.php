@@ -11,7 +11,7 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
-        $_mysqlClient = MysqlClient::getInstance(array());
+        $_mysqlClient = MysqlClient::getInstance($this->container, array());
         $_results = $_mysqlClient->rawQuery('SELECT * FROM informe_cuidado_critico_general;');
 
         $response = new Response();

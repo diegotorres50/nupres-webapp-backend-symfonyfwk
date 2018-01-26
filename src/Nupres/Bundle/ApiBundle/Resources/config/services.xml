@@ -4,12 +4,65 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <!--
+    <parameters>
+        <parameter key="nupres.factories_map.class">Nupres\Bundle\ApiBundle\Entity\Factories</parameter>
+        <parameter key="nupres.jwt.class">Nupres\Bundle\ApiBundle\Model\Security\JWToken</parameter>
+        <parameter key="nupres.credentials.class">Nupres\Bundle\ApiBundle\Model\Security\Credentials</parameter>
+    </parameters>
+
     <services>
-        <service id="nupres_api.example" class="Nupres\Bundle\ApiBundle\Example">
-            <argument type="service" id="service_id" />
-            <argument>plain_value</argument>
-            <argument>%parameter_name%</argument>
+        <service id="nupres.factories_map.service" class="%nupres.factories_map.class%">
+        </service>
+        <service id="nupres.jwt.service" class="%nupres.jwt.class%">
+        </service>
+        <service id="nupres.credentials.service" class="%nupres.credentials.class%">
+        </service>
+    </services>
+
+    <!--
+    <parameters>
+        <parameter key="etce_bbcnews.importer_service.class">Etce\BbcnewsBundle\Model\Importer</parameter>
+        <parameter key="etce_bbcnews.feeds_alias.class">Etce\BbcnewsBundle\Entity\Feeds</parameter>
+        <parameter key="etce_bbcnews.redis_service.class">Etce\BbcnewsBundle\Model\RedisClient</parameter>
+        <parameter key="wfcms_xalok.importer_service.class">Etce\BbcnewsBundle\Model\ArticleImporter</parameter>
+        <parameter key="wfcms_xalok.manually_set" type="collection">
+            <parameter>content</parameter>
+            <parameter>category</parameter>
+            <parameter>caption</parameter>
+            <parameter>tags</parameter>
+            <parameter>author</parameter>
+            <parameter>pageSlugs</parameter>
+            <parameter>media_content</parameter>
+        </parameter>
+        <parameter key="wfcms_xalok.ignored_fields" type="collection">
+            <parameter>guid</parameter>
+            <parameter>media_thumbnail</parameter>
+            <parameter>firstPublishedAt</parameter>
+            <parameter>publishedAt</parameter>
+        </parameter>
+    </parameters>
+
+    <services>
+        <service id="etce_bbcnews.importer_service" class="%etce_bbcnews.importer_service.class%">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="logger" />
+            <argument type="service" id="wfcms_xalok.importer_service" />
+        </service>
+        <service id="etce_bbcnews.feeds_alias" class="%etce_bbcnews.feeds_alias.class%">
+        </service>
+        <service id="etce_bbcnews.redis_service" class="%etce_bbcnews.redis_service.class%">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="wfcms_xalok.importer_service" class="%wfcms_xalok.importer_service.class%">
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="service_container" />
+            <argument type="service" id="wf_cms.page_manager" />
+            <argument type="service" id="wf_cms.repository.image" />
+            <argument type="service" id="wf_cms.repository.category" />
+            <argument type="service" id="wf_cms.repository.tag" />
+            <argument type="service" id="wf_cms.repository.user" />
+            <argument>%wfcms_xalok.manually_set%</argument>
+            <argument>%wfcms_xalok.ignored_fields%</argument>
         </service>
     </services>
     -->
