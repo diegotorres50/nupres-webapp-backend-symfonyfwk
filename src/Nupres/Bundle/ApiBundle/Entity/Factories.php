@@ -9,7 +9,7 @@ namespace Nupres\Bundle\ApiBundle\Entity;
 class Factories
 {
     const DEMO01          = 'nupres_dev_demo01';
-    const DEMO02          = 'nupres_dev_demo02';
+    const DEMO02          = 'nupresco_dev_demo01';
 
     public static function getFactoriesMap()
     {
