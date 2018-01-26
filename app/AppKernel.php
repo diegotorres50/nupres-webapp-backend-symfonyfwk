@@ -16,6 +16,7 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new AppBundle\AppBundle(),
+            new Nupres\Bundle\ApiBundle\NupresApiBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'), true)) {
@@ -31,5 +32,12 @@ class AppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->getRootDir().'/config/config_'.$this->getEnvironment().'.yml');
+    }
+
+    // Para solucionar warning servergrove.com por mensaje: date_default_timezone_get() - It is not safe to rely on the system's timezone settings 
+    public function __construct($environment, $debug)
+    {
+        date_default_timezone_set( 'America/Bogota' );
+        parent::__construct($environment, $debug);
     }
 }

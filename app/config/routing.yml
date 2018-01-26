@@ -1,3 +1,7 @@
+nupres_api:
+    resource: "@NupresApiBundle/Resources/config/routing.xml"
+    prefix:   /
+
 app:
     resource: '@AppBundle/Controller/'
     type: annotation
