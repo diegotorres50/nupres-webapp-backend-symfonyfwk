@@ -47,6 +47,16 @@ class Configuration implements ConfigurationInterface
                 ))
             ->end()
 
+            ->arrayNode('api_key')
+                ->prototype('scalar')->end()
+                ->defaultValue(array(
+                    'authorization' => array(
+                        'user'  => 'nupres',
+                        'pass'  => '123456'
+                    )
+                ))
+            ->end()
+
         ->end();
 
         return $treeBuilder;

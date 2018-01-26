@@ -8,47 +8,72 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Nupres\Bundle\ApiBundle\Model\Security\Auth;
 
-use Nupres\Bundle\ApiBundle\Entity\Factories;
-
 class SecurityController extends Controller
 {
     public function loginAction(Request $request)
     {
-        // Respuesta a entregar
+        // $feedback para construir la respuesta de la api
         $feedback = array();
 
-        // Parametros para hacer el login
+        // $params para construir los parametros que requiere el model
         $params = array();
 
         try {
-            // Obtenemos por post los valores de conexion
+            // Obtenemos del header la api key para validar el acceso
+            $apiKey = $request->headers->get('Authorization');
+
+            // Retornamos error de parametros si no se especifica credencial de acceso
+            if (empty($apiKey)) {
+                throw new \Exception("Error de credenciales");
+            }
+
+            // Invocamos el servicio que valida las credenciales de la api
+            $credentialsService = $this->container->get('nupres.credentials.service');
+
+            // Verificamos las credenciales de acceso usando la decodificacion base64
+            if (!$credentialsService::checked($this->container, $apiKey)) {
+                throw new \Exception("No autorizado");
+            }
+
+            // Obtenemos por post los parametros del body / application/x-www-form-urlencoded
+
+            // $username es el user_id o user_mail en base de datos
             $username = trim($request->request->get('username', null));
+
+            // $password es la clave del usuario en base de datos
             $password = trim($request->request->get('password', null));
+
+            // Cada cliente tendra una base de datos (factory) independiente
             $database = trim($request->request->get('factory', null));
 
-            // Construimos parcialmente la respuesta
+            // Obtenemos todos los parametros recibidos por post
             $feedback['entry'] = $request->request->all();
 
-            // Validamos datos de entrada
+            // Validamos que exista el username en el request
             if (!empty($username)) {
                 $params['username'] = $username;
             } else {
                 throw new \Exception("username no fue encontrado");
             }
 
+            // Validamos que exista la clave en el request
             if (!empty($password)) {
                 $params['password'] = $password;
             } else {
                 throw new \Exception("clave no fue encontrada");
             }
 
+            // Validamos que exista la base de datos en el request
             if (!empty($database)) {
                 $params['database'] = $database;
             } else {
                 throw new \Exception("factory no fue encontrado");
             }
 
+            // Invovamos el servicio de autenticacion de usuarios
             $authService = new Auth($this->container, $params);
+
+            // Tratamos de hacer login al usuario
             $userData = $authService->login($params);
 
             if (is_array($userData) and !empty($userData)) {
