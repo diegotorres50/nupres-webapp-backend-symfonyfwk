@@ -39,7 +39,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('jwt')
                 ->prototype('scalar')->end()
                 ->defaultValue(array(
-                    'secret_key'    =>  'Sdw1s9x8@',
+                    'secret_key'    =>  'nupres',
                     'algorithms'    =>  ['HS256'],
                     'iss'           =>  'nupres.com.co',
                     'aud'           =>  'nupres.com.co',
@@ -51,8 +51,14 @@ class Configuration implements ConfigurationInterface
                 ->prototype('scalar')->end()
                 ->defaultValue(array(
                     'authorization' => array(
-                        'user'  => 'nupres',
-                        'pass'  => '123456'
+                        'provider_1' => array (
+                            'user'  => 'nupres',
+                            'pass'  => '123456'
+                        ),
+                        'provider_2' => array (
+                            'user'  => 'nupres1',
+                            'pass'  => '1234561'
+                        )
                     )
                 ))
             ->end()

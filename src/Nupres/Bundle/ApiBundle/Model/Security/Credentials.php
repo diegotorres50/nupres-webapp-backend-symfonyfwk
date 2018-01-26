@@ -19,7 +19,7 @@ class Credentials
 
         $credentialsConfig = $container->getParameter('nupres_config.api_key');
 
-        if ($credentialsConfig['authorization']['user'] == $user && $credentialsConfig['authorization']['pass'] == $pass) {
+        if ($credentialsConfig['authorization']['provider_1']['user'] == $user && $credentialsConfig['authorization']['provider_1']['pass'] == $pass) {
             return true;
         }
     }
