@@ -424,7 +424,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `usuarios_before_ins_tr` BEFORE INSERT ON `usuarios` FOR EACH ROW BEGIN
+/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `usuarios_before_ins_tr` BEFORE INSERT ON `usuarios` FOR EACH ROW BEGIN
 
 SET NEW.user_pass = MD5(MD5(NEW.user_pass));
 
@@ -444,7 +444,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `usuarios_before_upd_tr` BEFORE UPDATE ON `usuarios` FOR EACH ROW BEGIN
+/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `usuarios_before_upd_tr` BEFORE UPDATE ON `usuarios` FOR EACH ROW BEGIN
 
 if NEW.user_pass <> old.user_pass then
   SET NEW.user_pass = MD5(MD5(NEW.user_pass)); end if;
@@ -470,7 +470,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXCUBRIMIENTOMETACALORICA`(`aporte_kilocalorias_24h` INT, `meta_calorica` INT) RETURNS decimal(10,0)
+CREATE FUNCTION `FXCUBRIMIENTOMETACALORICA`(`aporte_kilocalorias_24h` INT, `meta_calorica` INT) RETURNS decimal(10,0)
 BEGIN
 
   /* Calcula el cubrimiento porcentual de la meta calorica del paciente */
@@ -494,7 +494,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXCUBRIMIENTOMETAVOLUMEN`(`meta_volumen` INT, `volumen_infundido_24h` INT) RETURNS decimal(10,0)
+CREATE FUNCTION `FXCUBRIMIENTOMETAVOLUMEN`(`meta_volumen` INT, `volumen_infundido_24h` INT) RETURNS decimal(10,0)
 BEGIN
 
   /* Calcula el cubrimiento porcentual de la meta calorica del paciente */
@@ -518,7 +518,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXGASTOENERGETICOBASAL`(`peso_actual` DECIMAL, `talla` DECIMAL, `edad` INT) RETURNS decimal(10,0)
+CREATE FUNCTION `FXGASTOENERGETICOBASAL`(`peso_actual` DECIMAL, `talla` DECIMAL, `edad` INT) RETURNS decimal(10,0)
 BEGIN
 
   /* Calcula el gasto energetico basal del paciente*/
@@ -546,7 +546,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXGRAMOSPROTEINADIARIA`(`meta_volumen` int, `proteina_mililitro` decimal(10,3)) RETURNS int(11)
+CREATE FUNCTION `FXGRAMOSPROTEINADIARIA`(`meta_volumen` int, `proteina_mililitro` decimal(10,3)) RETURNS int(11)
     DETERMINISTIC
 BEGIN
 
@@ -569,7 +569,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXGRAMOSPROTEINAKGPESO`(`gramos_proteina_diaria` INT, `peso_actual` DECIMAL) RETURNS decimal(10,0)
+CREATE FUNCTION `FXGRAMOSPROTEINAKGPESO`(`gramos_proteina_diaria` INT, `peso_actual` DECIMAL) RETURNS decimal(10,0)
 BEGIN
 
 /* Calcula los calcula los gramos de proteina por kg de peso del paciente*/
@@ -591,7 +591,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXINDICEMASACORPORAL`(`peso_actual` DECIMAL, `talla` DECIMAL) RETURNS decimal(10,0)
+CREATE FUNCTION `FXINDICEMASACORPORAL`(`peso_actual` DECIMAL, `talla` DECIMAL) RETURNS decimal(10,0)
 BEGIN
 
 /* Calcula el indice de masa corporal del paciente*/
@@ -613,7 +613,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `fxKcKgAplicadas`(`kilocalorias_kilogramo_peso` INT, `aporte_kilocalorias_24h` INT) RETURNS int(11)
+CREATE FUNCTION `fxKcKgAplicadas`(`kilocalorias_kilogramo_peso` INT, `aporte_kilocalorias_24h` INT) RETURNS int(11)
 BEGIN
 
 /* Calcula la kilocalorias aplicadas por kilogramo del paciente*/
@@ -635,7 +635,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXMETACALORICA`(`kilocalorias_kilogramo_peso` INT, `peso` DECIMAL) RETURNS int(11)
+CREATE FUNCTION `FXMETACALORICA`(`kilocalorias_kilogramo_peso` INT, `peso` DECIMAL) RETURNS int(11)
     DETERMINISTIC
 BEGIN
 
@@ -658,7 +658,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` FUNCTION `FXMETAVOLUMEN`(`kilocalorias_kilogramo_peso` int, `peso` decimal(10,3), `kilocalorias_mililitro` decimal(10,3)) RETURNS int(11)
+CREATE FUNCTION `FXMETAVOLUMEN`(`kilocalorias_kilogramo_peso` int, `peso` decimal(10,3), `kilocalorias_mililitro` decimal(10,3)) RETURNS int(11)
     DETERMINISTIC
 BEGIN
 
@@ -685,7 +685,7 @@ DELIMITER ;
 /*!50001 SET character_set_results     = utf8 */;
 /*!50001 SET collation_connection      = utf8_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50013 */
 /*!50001 VIEW `informe_cuidado_critico_general` AS select `ingresos`.`id` AS `ingreso_cod`,`ingresos`.`paciente_id` AS `paciente_doc`,`pacientes`.`nombres` AS `paciente_nombres`,`pacientes`.`apellidos` AS `paciente_apellidos`,`ingresos`.`fecha_ingreso` AS `ingreso`,(to_days(now()) - to_days(`ingresos`.`fecha_ingreso`)) AS `dias_ingreso`,`ingresos`.`fecha_mipres` AS `fecha_mipres`,(to_days(now()) - to_days(`ingresos`.`fecha_mipres`)) AS `dias_mipres`,`pacientes`.`media_envergadura` AS `media_envergadura`,`pacientes`.`altura_rodilla` AS `altura_rodilla`,`ingresos`.`fecha_egreso` AS `fecha_egreso`,`ingresos`.`observaciones` AS `observaciones`,`ingresos`.`estado` AS `estado`,`ingresos`.`seguimiento` AS `seguimiento`,`ref-egresos`.`nombre` AS `motivo_egreso`,`evoluciones`.`id` AS `evolucion_id`,`ref-formulas`.`kilocalorias_mililitro` AS `formula_kilocalorias_mililitro`,`ref-formulas`.`proteina_mililitro` AS `formula_proteina_mililitro`,`ref-ubicaciones`.`nombre` AS `ubicacion`,`ubicaciones`.`cama` AS `cama`,`pacientes`.`fecha_nacimiento` AS `nacimiento`,(year(now()) - year(`pacientes`.`fecha_nacimiento`)) AS `edad`,`pacientes`.`genero` AS `sexo`,`ingresos`.`eps` AS `eps`,`ref-manejos`.`nombre` AS `manejo`,`ref-formulas`.`nombre` AS `formula`,`evoluciones`.`peso_actual` AS `peso`,`pacientes`.`talla` AS `talla`,`FXGASTOENERGETICOBASAL`(`evoluciones`.`peso_actual`,`pacientes`.`talla`,(year(now()) - year(`pacientes`.`fecha_nacimiento`))) AS `gasto_energetico_basal`,`FXINDICEMASACORPORAL`(`evoluciones`.`peso_actual`,`pacientes`.`talla`) AS `indice_masa_corporal`,`evoluciones`.`kilocalorias_kilogramo_peso` AS `kilocalorias_kilogramo_peso`,`FXMETACALORICA`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`) AS `meta_calorica`,`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`) AS `meta_volumen`,`evoluciones`.`volumen_infundido` AS `volumen_infundido`,`FXCUBRIMIENTOMETAVOLUMEN`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`evoluciones`.`volumen_infundido`) AS `cumplimiento_meta_volumen`,`FXGRAMOSPROTEINADIARIA`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`ref-formulas`.`proteina_mililitro`) AS `gramos_proteina_diaria`,`FXGRAMOSPROTEINAKGPESO`(`FXGRAMOSPROTEINADIARIA`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`ref-formulas`.`proteina_mililitro`),`evoluciones`.`peso_actual`) AS `gramos_proteina_kg_peso`,`FXCUBRIMIENTOMETACALORICA`(`FXGRAMOSPROTEINADIARIA`(`FXMETAVOLUMEN`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`,`ref-formulas`.`kilocalorias_mililitro`),`ref-formulas`.`proteina_mililitro`),`FXMETACALORICA`(`evoluciones`.`kilocalorias_kilogramo_peso`,`evoluciones`.`peso_actual`)) AS `cumplimiento_meta_calorica` from (((((((`ingresos` join `pacientes`) join `evoluciones`) join `ref-ubicaciones`) join `ubicaciones`) join `ref-manejos`) join `ref-formulas`) join `ref-egresos`) where ((`ingresos`.`paciente_id` = `pacientes`.`id`) and (`evoluciones`.`ingreso_id` = `ingresos`.`id`) and (`ubicaciones`.`evolucion_id` = `evoluciones`.`id`) and (`ref-ubicaciones`.`id` = `ubicaciones`.`refubicacion_id`) and (`ref-manejos`.`id` = `evoluciones`.`manejo_id`) and (`ref-formulas`.`id` = `evoluciones`.`formula_id`) and (`ref-egresos`.`id` = `ingresos`.`motivo_egreso`) and (`ingresos`.`id` > 0)) order by `evoluciones`.`fecha_evolucion` desc */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
@@ -700,4 +700,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-25 16:47:23
+-- Dump completed on 2018-01-26 14:56:55
