@@ -70,6 +70,9 @@ class SecurityController extends Controller
                 throw new \Exception("factory no fue encontrado");
             }
 
+            // Para una bandera
+            $params['source'] = 'login';
+
             // Invovamos el servicio de autenticacion de usuarios
             $authService = new Auth($this->container, $params);
 
@@ -95,7 +98,7 @@ class SecurityController extends Controller
                 //Si la sesion ya existe, no mostramos el formulario de login
                 if ($request->getSession()->has($database . '.' . $username) &&
                     !empty($request->getSession()->has($database . '.' . $username))) {
-                    // FIXME La session ya existia
+                    // FIXME Aqui debo hacer un clear o logout de la session
                 } else {
                     // Creamos la session
                     $session=$request->getSession();
@@ -104,10 +107,11 @@ class SecurityController extends Controller
                     $session->set(
                         $database . '.' . $username,
                         array(
-                            'user_info' => $userData,
-                            'database'  => $database
+                            'user_info' => $userData
                         )
                     );
+
+                    $session->set('database', $database);
                 }
 
                 // Creamos un userhash encriptado para re usarlo en todas las apis que requieran autenticar el usuario para verificar si tiene session activa
@@ -297,9 +301,6 @@ class SecurityController extends Controller
                 // Recuperamos los datos en session.
                 // @TODO si los datos de un usuario se actualizan, debemos actualizar la session
                 $userData = $session->get($userData->database . '.' . $userData->username);
-
-                // Invocamos el servicio jwt para encriptar datos
-                $jwTokenService = $this->container->get('nupres.jwt.service');
 
                 // Encriptamos la informacion del usuario
                 $data = $jwTokenService::encode(

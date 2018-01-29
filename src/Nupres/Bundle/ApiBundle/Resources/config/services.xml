@@ -17,6 +17,14 @@
         </service>
         <service id="nupres.credentials.service" class="%nupres.credentials.class%">
         </service>
+        <service
+            id="nupres.request.service"
+            class="Nupres\Bundle\ApiBundle\Model\Http\Request"
+        >
+            <argument type="service" id="request_stack"/>
+        </service>
+        <service id="nupres.dumper.service" class="Nupres\Bundle\ApiBundle\Model\Common\Dumper">
+        </service>
     </services>
 
     <!--

@@ -44,8 +44,20 @@ class MysqlClient
             $factoriesMapService = $container->get('nupres.factories_map.service');
             $factoriesMap = $factoriesMapService::getFactoriesMap();
 
-            // Como persistir esto que no sea session
-            $this->_dbName = $factoriesMap[strtoupper($arguments['database'])];
+            // Intentamos usar la info del userhash para indentificar la base de datos
+            // Invocamos el servicio jwt para desencriptar datos
+            if (!empty($arguments['userhash'])) {
+
+                $jwTokenService = $container->get('nupres.jwt.service');
+
+                $secretKeyConfig = $container->getParameter('nupres_config.jwt');
+
+                $userData = $jwTokenService::decode($arguments['userhash'], $secretKeyConfig['secret_key']);
+
+                $this->_dbName = $factoriesMap[strtoupper($userData->database)];
+            } elseif (!empty($arguments['database'])) {
+                $this->_dbName = $factoriesMap[strtoupper($arguments['database'])];
+            }
 
             $this->_client = new MysqliDb(
                 $this->_dbHost,
@@ -73,5 +85,23 @@ class MysqlClient
     public function rawQuery($query)
     {
         return $this->_client->rawQuery($query);
+    }
+
+    // Exec insert query
+    public function insert($table, $data)
+    {
+        return $this->_client->insert($table, $data);
+    }
+
+    // Get mysql last error
+    public function getLastError()
+    {
+        return $this->_client->getLastError();
+    }
+
+    // Get mysql last query
+    public function getLastQuery()
+    {
+        return $this->_client->getLastQuery();
     }
 }
