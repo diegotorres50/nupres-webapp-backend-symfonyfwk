@@ -43,7 +43,8 @@ class Configuration implements ConfigurationInterface
                     'algorithms'    =>  ['HS256'],
                     'iss'           =>  'nupres.com.co',
                     'aud'           =>  'nupres.com.co',
-                    'uid'           =>  'nupres.com.co'
+                    'uid'           =>  'nupres.com.co',
+                    'exp'           =>  time() + (60*60)
                 ))
             ->end()
 

@@ -11,6 +11,7 @@ class User
     private $_dumper;
     private $_jwt;
     private $_userhash;
+    private $_session;
 
     public function __construct(ContainerInterface $container = null, $userhash = null)
     {
@@ -20,6 +21,7 @@ class User
             $this->_dumper = $container->get('nupres.dumper.service');
             $this->_jwt = $container->get('nupres.jwt.service');
             $this->_userhash = $userhash;
+            $this->_session = $container->get('session');
         } catch (\Exception $ex) {
             throw $ex;
         }
@@ -28,6 +30,11 @@ class User
     private function _getDbName()
     {
         return $this->getDataFromUserhash()->database;
+    }
+
+    private function _getUsername()
+    {
+        return $this->getDataFromUserhash()->username;
     }
 
     public function getDbName()
@@ -47,5 +54,15 @@ class User
     public function getDataFromUserhash()
     {
         return $this->_getDataFromUserhash();
+    }
+
+    private function _getDataFromSession()
+    {
+        return $this->_session->get($this->_getDbName() . '.' . $this->_getUsername());
+    }
+
+    public function getDataFromSession()
+    {
+        return $this->_getDataFromSession();
     }
 }

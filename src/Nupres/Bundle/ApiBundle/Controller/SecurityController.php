@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Nupres\Bundle\ApiBundle\Model\Security\Auth;
 
+// Para obtener datos del objeto usuario
+use Nupres\Bundle\ApiBundle\Model\Operation\User;
+
 class SecurityController extends Controller
 {
     public function loginAction(Request $request)
@@ -70,10 +73,7 @@ class SecurityController extends Controller
                 throw new \Exception("factory no fue encontrado");
             }
 
-            // Para una bandera
-            $params['source'] = 'login';
-
-            // Invovamos el servicio de autenticacion de usuarios
+            // Invocamos el servicio de autenticacion de usuarios
             $authService = new Auth($this->container, $params);
 
             // Tratamos de hacer login al usuario
@@ -107,11 +107,10 @@ class SecurityController extends Controller
                     $session->set(
                         $database . '.' . $username,
                         array(
-                            'user_info' => $userData
+                            'user_info' => $userData,
+                            'database'  => $database
                         )
                     );
-
-                    $session->set('database', $database);
                 }
 
                 // Creamos un userhash encriptado para re usarlo en todas las apis que requieran autenticar el usuario para verificar si tiene session activa
@@ -198,30 +197,22 @@ class SecurityController extends Controller
                 throw new \Exception("userhash no fue encontrado");
             }
 
-            // Invocamos el servicio jwt para desencriptar datos
-            $jwTokenService = $this->container->get('nupres.jwt.service');
+            // Invocamos el servicio de autenticacion de usuarios
+            $authService = new Auth($this->container, ['userhash' => $userhash]);
 
-            $secretKeyConfig = $this->container->getParameter('nupres_config.jwt');
-
-            $userData = $jwTokenService::decode($userhash, $secretKeyConfig['secret_key']);
-
-            $session = $request->getSession();
-
-            //Si la sesion existe, entonces si la limpiamos
-            if ($session->has($userData->database . '.' . $userData->username)) {
+            // Validamos si el usuario tiene session activa
+            if ($authService->isLoggedIn($userhash)) {
                 //Cerramos ahora la sesion en el navegador
-                $session->clear();
+                $request->getSession()->clear();
             } else {
-                throw new \Exception("Datos incorrectos");
+                throw new \Exception("El usuario no esta loggeado");
             }
 
             // Terminamos de construir la respuesta de la api
             $feedback['status'] = 1;
             $feedback['msg'] = 'Okey';
             $feedback['code'] = 200;
-            $feedback['data']['username'] = $userData->username;
-            $feedback['data']['database'] = $userData->database;
-            $feedback['data']['session_id'] = $userData->session_id;
+            $feedback['data'] = 1;
 
             // Retornamos un http response
             $response = new Response();
@@ -287,20 +278,21 @@ class SecurityController extends Controller
                 throw new \Exception("userhash no fue encontrado");
             }
 
-            // Invocamos el servicio jwt para desencriptar datos
-            $jwTokenService = $this->container->get('nupres.jwt.service');
+            // Invocamos el servicio de autenticacion de usuarios
+            $authService = new Auth($this->container, ['userhash' => $userhash]);
 
-            $secretKeyConfig = $this->container->getParameter('nupres_config.jwt');
-
-            $userData = $jwTokenService::decode($userhash, $secretKeyConfig['secret_key']);
-
-            $session = $request->getSession();
-
-            //Si la sesion existe, entonces
-            if ($session->has($userData->database . '.' . $userData->username)) {
+            // Validamos si el usuario tiene session activa
+            if ($authService->isLoggedIn($userhash)) {
                 // Recuperamos los datos en session.
                 // @TODO si los datos de un usuario se actualizan, debemos actualizar la session
-                $userData = $session->get($userData->database . '.' . $userData->username);
+                // Invocamos el servicio de gestion de usuarios
+                $userService = new User($this->container, $userhash);
+
+                // Obtenemos del objeto usuario la info de la bd a la que se conectara
+                $userData = $userService->getDataFromSession();
+
+                // Invocamos el servicio del jwt
+                $jwTokenService = $this->container->get('nupres.jwt.service');
 
                 // Encriptamos la informacion del usuario
                 $data = $jwTokenService::encode(
@@ -310,7 +302,7 @@ class SecurityController extends Controller
                     )
                 );
             } else {
-                throw new \Exception("Datos incorrectos");
+                throw new \Exception("El usuario no esta loggeado");
             }
 
             // Terminamos de construir la respuesta de la api

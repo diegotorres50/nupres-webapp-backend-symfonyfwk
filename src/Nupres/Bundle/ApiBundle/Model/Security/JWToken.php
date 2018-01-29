@@ -3,19 +3,30 @@
 namespace Nupres\Bundle\ApiBundle\Model\Security;
 
 use \Firebase\JWT\JWT;
-
-// https://symfony.com/doc/current/components/using_components.html
-// How to Install and Use the Symfony Components
-// Para poder user guzzle client desde el vendor del bundle
-//require_once __DIR__.'/../vendor/autoload.php';
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class JWToken
 {
-    private static $secretKey = 'nupres';
-    private static $encrypt = ['HS256'];
-    private static $iss = 'nupres.com.co';
-    private static $aud = 'nupres.com.co';
-    private static $uid = 'nupres.com.co';
+    private static $secretKey;
+    private static $encrypt;
+    private static $iss;
+    private static $aud;
+    private static $uid;
+    private static $exp;
+
+    public function __construct(ContainerInterface $container = null)
+    {
+        try {
+            self::$secretKey = $container->getParameter('nupres_config.jwt')['secret_key'];
+            self::$encrypt = $container->getParameter('nupres_config.jwt')['algorithms'];
+            self::$iss = $container->getParameter('nupres_config.jwt')['iss'];
+            self::$aud = $container->getParameter('nupres_config.jwt')['aud'];
+            self::$uid = $container->getParameter('nupres_config.jwt')['uid'];
+            self::$exp = $container->getParameter('nupres_config.jwt')['exp'];
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
+    }
 
     public static function encode($data = [])
     {
@@ -24,12 +35,17 @@ class JWToken
 
             $token = array(
                 'iat'   => $time, // La hora actual de emision, en segundos transcurridos desde el punto de inicio del tiempo UNIX.
-                'exp'   => $time + (60*60), // Tiempo que expirará el token (+1 hora)
                 "iss"   => self::$iss, // Emisor del token
                 "aud"   => self::$aud, // Publico al que va dirigo el token
                 "uid"   => self::$uid, // El identificador único del usuario que accedió debe ser una string que contenga entre 1 y 36 caracteres.
                 'data'  => $data
             );
+
+            // Sino extuviera set el 'exp' key, en teoria el token no expira
+            if (!empty(self::$exp)) {
+                // Example: $time + (60*60), // Tiempo que expirará el token (+1 hora)
+                $token['exp'] = self::$exp;
+            }
 
             return JWT::encode($token, self::$secretKey);
         } catch (\Exception $ex) {
@@ -45,7 +61,7 @@ class JWToken
 
         $decode = JWT::decode(
             $token,
-            $secretKey,
+            self::$secretKey,
             self::$encrypt
         );
 
