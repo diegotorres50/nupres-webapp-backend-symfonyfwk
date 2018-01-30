@@ -15,11 +15,9 @@ class Patient
 
     private $_dumper;
 
-    const ADD_QUERY = 'INSERT INTO `%s`.`pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`) VALUES (%s,\'%s\',\'%s\',\'%s\',\'%s\',%s,%s,%s);';
+    private $_dbEntities;
 
-    const GET_ALL_QUERY = 'SELECT %s FROM pacientes_activos ORDER BY %s %s LIMIT %s, %s;';
-
-    const PURGE_ALL_QUERY = 'DELETE FROM pacientes WHERE purge = 1';
+    const GET_ALL_QUERY = 'SELECT %s FROM %s ORDER BY %s %s LIMIT %s, %s;';
 
     public function __construct(ContainerInterface $container = null, $params = [])
     {
@@ -28,6 +26,8 @@ class Patient
             $this->_dbClient = MysqlClient::getInstance($container, $params);
             $this->_request = $container->get('nupres.request.service');
             $this->_dumper = $container->get('nupres.dumper.service');
+            $dbEntitiesService = $container->get('nupres.db_entities.service');
+            $this->_dbEntities = $dbEntitiesService::getDbEntities();
         } catch (\Exception $ex) {
             throw $ex;
         }
@@ -87,7 +87,7 @@ class Patient
 
         $database = $factoriesMap[strtoupper($params['database'])];
 
-        if ($patient = $this->_dbClient->insert($database . '.pacientes', $data)) {
+        if ($patient = $this->_dbClient->insert($database . '.' . $this->_dbEntities['TABLE_PACIENTES'], $data)) {
             return $patient;
         } elseif (boolval($this->_request->getQueryString('debugger'))) {
             $dumper = $this->_dumper;
@@ -107,6 +107,7 @@ class Patient
             sprintf(
                 self::GET_ALL_QUERY,
                 $params['fields'],
+                $this->_dbEntities['VIEW_PACIENTES_ACTIVOS'],
                 $params['order_by_column'],
                 $params['order_by_sort'],
                 $params['offset'],
@@ -123,11 +124,34 @@ class Patient
     private function _deleteAll()
     {
         $this->_dbClient->where('purged', 1);
-        return $this->_dbClient->delete('pacientes');
+        return $this->_dbClient->delete($this->_dbEntities['TABLE_PACIENTES']);
     }
 
     public function deleteAll()
     {
         return $this->_deleteAll();
+    }
+
+    private function _updateById($id, $params = [])
+    {
+
+        foreach ($params as $key => $value) {
+            if ($key == 'id') {
+                continue;
+            }
+            $data[$key] = $value;
+        }
+
+        $this->_dbClient->where('id', $id);
+
+        return array(
+            'status' => intval($this->_dbClient->update($this->_dbEntities['TABLE_PACIENTES'], $data)),
+            'msg' => intval($this->_dbClient->getAffectedRowsCount()) . ' records were updated'
+        );
+    }
+
+    public function updateById($id, $params = [])
+    {
+        return $this->_updateById($id, $params);
     }
 }

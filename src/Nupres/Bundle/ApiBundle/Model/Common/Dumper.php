@@ -8,4 +8,9 @@ class Dumper
     {
         return dump('[DEBUGGER ' . date('YmdHis', time()) . ' ' . (microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . '] ' . $log);
     }
+
+    public static function debugger($log)
+    {
+        print_r(json_decode((array) $log, true));
+    }
 }

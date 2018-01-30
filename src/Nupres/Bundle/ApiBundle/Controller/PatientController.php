@@ -307,6 +307,8 @@ class PatientController extends Controller
         $params = array();
 
         try {
+            $debugger = $this->container->get('nupres.dumper.service');
+            //$debugger::debugger('esto es una prueba' . (array('1' => 2))); die;
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
@@ -445,19 +447,27 @@ class PatientController extends Controller
             // Obtenemos del objeto usuario la info de la bd a la que se conectara
             $params['database'] = $userService->getDbName();
 
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $id = trim($request->query->get('id', null));
+
+            // Validamos que exista el userhash en el request
+            if (empty($id)) {
+                throw new \Exception("id no fue encontrado");
+            }
+
             // Obtenemos todos los parametros recibidos por post
             $feedback['entry'] = $request->query->all();
 
             // Invocamos el servicio de pacientes
             $patientService = new Patient($this->container, $params);
 
-            $data = $patientService->deleteAll();
+            $data = $patientService->updateById($id, array('purged' => 1));
 
             // Terminamos de construir la respuesta de la api
             $feedback['status'] = 1;
             $feedback['msg'] = 'Okey';
             $feedback['code'] = 200;
-            $feedback['data'] = intval($data);
+            $feedback['data'] = $data;
 
             // Retornamos un http response
             $response = new Response();

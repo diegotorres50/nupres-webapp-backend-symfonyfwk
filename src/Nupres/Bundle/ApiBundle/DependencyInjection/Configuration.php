@@ -44,7 +44,7 @@ class Configuration implements ConfigurationInterface
                     'iss'           =>  'nupres.com.co',
                     'aud'           =>  'nupres.com.co',
                     'uid'           =>  'nupres.com.co',
-                    'exp'           =>  time() + (60*60)
+                    'exp'           =>  0
                 ))
             ->end()
 

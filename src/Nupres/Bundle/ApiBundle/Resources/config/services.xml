@@ -26,5 +26,7 @@
         </service>
         <service id="nupres.dumper.service" class="Nupres\Bundle\ApiBundle\Model\Common\Dumper">
         </service>
+        <service id="nupres.db_entities.service" class="Nupres\Bundle\ApiBundle\Entity\Entities">
+        </service>
     </services>
 </container>

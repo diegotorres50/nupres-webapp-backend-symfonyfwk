@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.21, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.59, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: nupres_dev_demo01
 -- ------------------------------------------------------
--- Server version   5.7.21-0ubuntu0.16.04.1
+-- Server version   5.5.59-0ubuntu0.14.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -85,45 +85,46 @@ DROP TABLE IF EXISTS `informe_cuidado_critico_general`;
 /*!50001 DROP VIEW IF EXISTS `informe_cuidado_critico_general`*/;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-/*!50001 CREATE VIEW `informe_cuidado_critico_general` AS SELECT
- 1 AS `ingreso_cod`,
- 1 AS `paciente_doc`,
- 1 AS `paciente_nombres`,
- 1 AS `paciente_apellidos`,
- 1 AS `ingreso`,
- 1 AS `dias_ingreso`,
- 1 AS `fecha_mipres`,
- 1 AS `dias_mipres`,
- 1 AS `media_envergadura`,
- 1 AS `altura_rodilla`,
- 1 AS `fecha_egreso`,
- 1 AS `observaciones`,
- 1 AS `estado`,
- 1 AS `seguimiento`,
- 1 AS `motivo_egreso`,
- 1 AS `evolucion_id`,
- 1 AS `formula_kilocalorias_mililitro`,
- 1 AS `formula_proteina_mililitro`,
- 1 AS `ubicacion`,
- 1 AS `cama`,
- 1 AS `nacimiento`,
- 1 AS `edad`,
- 1 AS `sexo`,
- 1 AS `eps`,
- 1 AS `manejo`,
- 1 AS `formula`,
- 1 AS `peso`,
- 1 AS `talla`,
- 1 AS `gasto_energetico_basal`,
- 1 AS `indice_masa_corporal`,
- 1 AS `kilocalorias_kilogramo_peso`,
- 1 AS `meta_calorica`,
- 1 AS `meta_volumen`,
- 1 AS `volumen_infundido`,
- 1 AS `cumplimiento_meta_volumen`,
- 1 AS `gramos_proteina_diaria`,
- 1 AS `gramos_proteina_kg_peso`,
- 1 AS `cumplimiento_meta_calorica`*/;
+/*!50001 CREATE TABLE `informe_cuidado_critico_general` (
+  `ingreso_cod` tinyint NOT NULL,
+  `paciente_doc` tinyint NOT NULL,
+  `paciente_nombres` tinyint NOT NULL,
+  `paciente_apellidos` tinyint NOT NULL,
+  `ingreso` tinyint NOT NULL,
+  `dias_ingreso` tinyint NOT NULL,
+  `fecha_mipres` tinyint NOT NULL,
+  `dias_mipres` tinyint NOT NULL,
+  `media_envergadura` tinyint NOT NULL,
+  `altura_rodilla` tinyint NOT NULL,
+  `fecha_egreso` tinyint NOT NULL,
+  `observaciones` tinyint NOT NULL,
+  `estado` tinyint NOT NULL,
+  `seguimiento` tinyint NOT NULL,
+  `motivo_egreso` tinyint NOT NULL,
+  `evolucion_id` tinyint NOT NULL,
+  `formula_kilocalorias_mililitro` tinyint NOT NULL,
+  `formula_proteina_mililitro` tinyint NOT NULL,
+  `ubicacion` tinyint NOT NULL,
+  `cama` tinyint NOT NULL,
+  `nacimiento` tinyint NOT NULL,
+  `edad` tinyint NOT NULL,
+  `sexo` tinyint NOT NULL,
+  `eps` tinyint NOT NULL,
+  `manejo` tinyint NOT NULL,
+  `formula` tinyint NOT NULL,
+  `peso` tinyint NOT NULL,
+  `talla` tinyint NOT NULL,
+  `gasto_energetico_basal` tinyint NOT NULL,
+  `indice_masa_corporal` tinyint NOT NULL,
+  `kilocalorias_kilogramo_peso` tinyint NOT NULL,
+  `meta_calorica` tinyint NOT NULL,
+  `meta_volumen` tinyint NOT NULL,
+  `volumen_infundido` tinyint NOT NULL,
+  `cumplimiento_meta_volumen` tinyint NOT NULL,
+  `gramos_proteina_diaria` tinyint NOT NULL,
+  `gramos_proteina_kg_peso` tinyint NOT NULL,
+  `cumplimiento_meta_calorica` tinyint NOT NULL
+) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -196,9 +197,34 @@ CREATE TABLE `pacientes` (
 
 LOCK TABLES `pacientes` WRITE;
 /*!40000 ALTER TABLE `pacientes` DISABLE KEYS */;
-INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`, `created_at`, `created_by`, `modified_at`, `modified_by`, `purged`) VALUES (12345601,'Carla','Gomez','F','1984-06-17',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0'),(12345602,'Carla','Gomez','F','1984-06-17',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0'),(12345603,'Carla','Gomez','F','1984-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345604,'Carla','Gomez','F','1984-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345605,'Carla','Gomez','F','1984-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345606,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345607,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345608,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(80123858,'Diego','Torres','M','1981-06-17',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0'),(125434455,'Mariana','Torres','F','2006-09-12',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0');
+INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`, `created_at`, `created_by`, `modified_at`, `modified_by`, `purged`) VALUES (12345606,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345607,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345608,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345611,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(80123858,'Diego','Torres','M','1981-06-17',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0'),(125434455,'Mariana','Torres','F','2006-09-12',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0');
 /*!40000 ALTER TABLE `pacientes` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Temporary table structure for view `pacientes_activos`
+--
+
+DROP TABLE IF EXISTS `pacientes_activos`;
+/*!50001 DROP VIEW IF EXISTS `pacientes_activos`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE TABLE `pacientes_activos` (
+  `id` tinyint NOT NULL,
+  `nombres` tinyint NOT NULL,
+  `apellidos` tinyint NOT NULL,
+  `genero` tinyint NOT NULL,
+  `fecha_nacimiento` tinyint NOT NULL,
+  `talla` tinyint NOT NULL,
+  `media_envergadura` tinyint NOT NULL,
+  `altura_rodilla` tinyint NOT NULL,
+  `created_at` tinyint NOT NULL,
+  `created_by` tinyint NOT NULL,
+  `modified_at` tinyint NOT NULL,
+  `modified_by` tinyint NOT NULL,
+  `purged` tinyint NOT NULL
+) ENGINE=MyISAM */;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `ref-dx`
@@ -680,6 +706,7 @@ DELIMITER ;
 -- Final view structure for view `informe_cuidado_critico_general`
 --
 
+/*!50001 DROP TABLE IF EXISTS `informe_cuidado_critico_general`*/;
 /*!50001 DROP VIEW IF EXISTS `informe_cuidado_critico_general`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -693,6 +720,25 @@ DELIMITER ;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `pacientes_activos`
+--
+
+/*!50001 DROP TABLE IF EXISTS `pacientes_activos`*/;
+/*!50001 DROP VIEW IF EXISTS `pacientes_activos`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 */
+/*!50001 VIEW `pacientes_activos` AS select `pacientes`.`id` AS `id`,`pacientes`.`nombres` AS `nombres`,`pacientes`.`apellidos` AS `apellidos`,`pacientes`.`genero` AS `genero`,`pacientes`.`fecha_nacimiento` AS `fecha_nacimiento`,`pacientes`.`talla` AS `talla`,`pacientes`.`media_envergadura` AS `media_envergadura`,`pacientes`.`altura_rodilla` AS `altura_rodilla`,`pacientes`.`created_at` AS `created_at`,`pacientes`.`created_by` AS `created_by`,`pacientes`.`modified_at` AS `modified_at`,`pacientes`.`modified_by` AS `modified_by`,`pacientes`.`purged` AS `purged` from `pacientes` where (`pacientes`.`purged` = 0) order by `pacientes`.`created_at` desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -703,4 +749,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-28 19:22:20
+-- Dump completed on 2018-01-30 17:05:52

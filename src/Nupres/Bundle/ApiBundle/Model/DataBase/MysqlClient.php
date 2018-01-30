@@ -113,4 +113,14 @@ class MysqlClient
     {
         return $this->_client->delete($tableName, $numRows);
     }
+
+    public function update($tableName, $tableData, $numRows = null)
+    {
+        return $this->_client->update($tableName, $tableData, $numRows);
+    }
+
+    public function getAffectedRowsCount()
+    {
+        return $this->_client->count;
+    }
 }
