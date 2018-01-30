@@ -17,6 +17,8 @@ class Patient
 
     const ADD_QUERY = 'INSERT INTO `%s`.`pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`) VALUES (%s,\'%s\',\'%s\',\'%s\',\'%s\',%s,%s,%s);';
 
+    const GET_ALL_QUERY = 'SELECT %s FROM pacientes_activos ORDER BY %s %s LIMIT %s, %s;';
+
     public function __construct(ContainerInterface $container = null, $params = [])
     {
         try {
@@ -95,5 +97,24 @@ class Patient
     public function add($params = [])
     {
         return $this->_add($params);
+    }
+
+    private function _getAll($params = [])
+    {
+        return $this->_dbClient->rawQuery(
+            sprintf(
+                self::GET_ALL_QUERY,
+                $params['fields'],
+                $params['order_by_column'],
+                $params['order_by_sort'],
+                $params['offset'],
+                $params['count']
+            )
+        );
+    }
+
+    public function getAll($params = [])
+    {
+        return $this->_getAll($params);
     }
 }

@@ -21,4 +21,7 @@
   <route id="nupres_api_patient_add" path="/patient/add">
     <default key="_controller">NupresApiBundle:Patient:add</default>
   </route>
+  <route id="nupres_api_patient_get_all" path="/patient/all">
+    <default key="_controller">NupresApiBundle:Patient:getAll</default>
+  </route>
 </routes>
