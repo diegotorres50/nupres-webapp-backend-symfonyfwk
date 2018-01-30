@@ -47,7 +47,6 @@ class MysqlClient
             // Intentamos usar la info del userhash para indentificar la base de datos
             // Invocamos el servicio jwt para desencriptar datos
             if (!empty($arguments['userhash'])) {
-
                 $jwTokenService = $container->get('nupres.jwt.service');
 
                 $secretKeyConfig = $container->getParameter('nupres_config.jwt');
@@ -82,9 +81,9 @@ class MysqlClient
     }
 
     // Exec raw query
-    public function rawQuery($query)
+    public function rawQuery($query, $bindParams)
     {
-        return $this->_client->rawQuery($query);
+        return $this->_client->rawQuery($query, $bindParams);
     }
 
     // Exec insert query
@@ -103,5 +102,15 @@ class MysqlClient
     public function getLastQuery()
     {
         return $this->_client->getLastQuery();
+    }
+
+    public function where($whereProp, $whereValue = 'DBNULL', $operator = '=', $cond = 'AND')
+    {
+        return $this->_client->where($whereProp, $whereValue, $operator, $cond);
+    }
+
+    public function delete($tableName, $numRows = null)
+    {
+        return $this->_client->delete($tableName, $numRows);
     }
 }

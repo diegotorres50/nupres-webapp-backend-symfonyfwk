@@ -24,4 +24,10 @@
   <route id="nupres_api_patient_get_all" path="/patient/all">
     <default key="_controller">NupresApiBundle:Patient:getAll</default>
   </route>
+  <route id="nupres_api_patient_purge" path="/patient/purge">
+    <default key="_controller">NupresApiBundle:Patient:purge</default>
+  </route>
+  <route id="nupres_api_patient_delete" path="/patient/delete">
+    <default key="_controller">NupresApiBundle:Patient:delete</default>
+  </route>
 </routes>

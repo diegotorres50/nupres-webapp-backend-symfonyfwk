@@ -297,4 +297,196 @@ class PatientController extends Controller
             );
         }
     }
+
+    public function purgeAction(Request $request)
+    {
+        // $feedback para construir la respuesta de la api
+        $feedback = array();
+
+        // $params para construir los parametros que requiere el model
+        $params = array();
+
+        try {
+            // Obtenemos del header la api key para validar el acceso
+            $apiKey = $request->headers->get('Authorization');
+
+            // Retornamos error de parametros si no se especifica credencial de acceso
+            if (empty($apiKey)) {
+                throw new \Exception("Error de credenciales");
+            }
+
+            // Invocamos el servicio que valida las credenciales de la api
+            $credentialsService = $this->container->get('nupres.credentials.service');
+
+            // Verificamos las credenciales de acceso usando la decodificacion base64
+            if (!$credentialsService::checked($this->container, $apiKey)) {
+                throw new \Exception("No autorizado");
+            }
+
+            // Obtenemos por post los parametros del body / application/x-www-form-urlencoded
+
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $userhash = trim($request->query->get('userhash', null));
+
+            // Validamos que exista el userhash en el request
+            if (empty($userhash)) {
+                throw new \Exception("userhash no fue encontrado");
+            } else {
+                $params['userhash'] = $userhash;
+            }
+
+            // Invocamos el servicio de autenticacion de usuarios
+            $authService = new Auth($this->container, $params);
+
+            // Validamos si el usuario tiene session activa
+            if (!$authService->isLoggedIn($userhash)) {
+                throw new \Exception("El usuario no esta loggeado");
+            }
+
+            // Invocamos el servicio de gestion de usuarios
+            $userService = new User($this->container, $userhash);
+
+            // Obtenemos del objeto usuario la info de la bd a la que se conectara
+            $params['database'] = $userService->getDbName();
+
+            // Obtenemos todos los parametros recibidos por post
+            $feedback['entry'] = $request->query->all();
+
+            // Invocamos el servicio de pacientes
+            $patientService = new Patient($this->container, $params);
+
+            $data = $patientService->deleteAll();
+
+            // Terminamos de construir la respuesta de la api
+            $feedback['status'] = 1;
+            $feedback['msg'] = 'Okey';
+            $feedback['code'] = 200;
+            $feedback['data'] = intval($data);
+
+            // Retornamos un http response
+            $response = new Response();
+            $response->setContent(json_encode($feedback));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        } catch (\Exception $e) {
+            // Para los errores controlados, cosntruimos la respuesta
+            $feedback['status'] = 0;
+            $feedback['msg'] = 'Error';
+            $feedback['code'] = 400;
+            $feedback['data'] = null;
+            $feedback['error'] = array();
+            $feedback['error']['code'] = $e->getCode();
+            $feedback['error']['message'] = $e->getMessage();
+            $feedback['error']['line'] = $e->getLine();
+            $feedback['error']['file'] = $e->getFile();
+            $feedback['error']['method'] = __METHOD__;
+            $feedback['error']['trace'] = $e->__toString();
+
+            // Respondemos un error controlado
+            return new Response(
+                json_encode($feedback),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+        }
+    }
+
+    public function deleteAction(Request $request)
+    {
+        // $feedback para construir la respuesta de la api
+        $feedback = array();
+
+        // $params para construir los parametros que requiere el model
+        $params = array();
+
+        try {
+            // Obtenemos del header la api key para validar el acceso
+            $apiKey = $request->headers->get('Authorization');
+
+            // Retornamos error de parametros si no se especifica credencial de acceso
+            if (empty($apiKey)) {
+                throw new \Exception("Error de credenciales");
+            }
+
+            // Invocamos el servicio que valida las credenciales de la api
+            $credentialsService = $this->container->get('nupres.credentials.service');
+
+            // Verificamos las credenciales de acceso usando la decodificacion base64
+            if (!$credentialsService::checked($this->container, $apiKey)) {
+                throw new \Exception("No autorizado");
+            }
+
+            // Obtenemos por post los parametros del body / application/x-www-form-urlencoded
+
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $userhash = trim($request->query->get('userhash', null));
+
+            // Validamos que exista el userhash en el request
+            if (empty($userhash)) {
+                throw new \Exception("userhash no fue encontrado");
+            } else {
+                $params['userhash'] = $userhash;
+            }
+
+            // Invocamos el servicio de autenticacion de usuarios
+            $authService = new Auth($this->container, $params);
+
+            // Validamos si el usuario tiene session activa
+            if (!$authService->isLoggedIn($userhash)) {
+                throw new \Exception("El usuario no esta loggeado");
+            }
+
+            // Invocamos el servicio de gestion de usuarios
+            $userService = new User($this->container, $userhash);
+
+            // Obtenemos del objeto usuario la info de la bd a la que se conectara
+            $params['database'] = $userService->getDbName();
+
+            // Obtenemos todos los parametros recibidos por post
+            $feedback['entry'] = $request->query->all();
+
+            // Invocamos el servicio de pacientes
+            $patientService = new Patient($this->container, $params);
+
+            $data = $patientService->deleteAll();
+
+            // Terminamos de construir la respuesta de la api
+            $feedback['status'] = 1;
+            $feedback['msg'] = 'Okey';
+            $feedback['code'] = 200;
+            $feedback['data'] = intval($data);
+
+            // Retornamos un http response
+            $response = new Response();
+            $response->setContent(json_encode($feedback));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        } catch (\Exception $e) {
+            // Para los errores controlados, cosntruimos la respuesta
+            $feedback['status'] = 0;
+            $feedback['msg'] = 'Error';
+            $feedback['code'] = 400;
+            $feedback['data'] = null;
+            $feedback['error'] = array();
+            $feedback['error']['code'] = $e->getCode();
+            $feedback['error']['message'] = $e->getMessage();
+            $feedback['error']['line'] = $e->getLine();
+            $feedback['error']['file'] = $e->getFile();
+            $feedback['error']['method'] = __METHOD__;
+            $feedback['error']['trace'] = $e->__toString();
+
+            // Respondemos un error controlado
+            return new Response(
+                json_encode($feedback),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+        }
+    }
 }

@@ -19,6 +19,8 @@ class Patient
 
     const GET_ALL_QUERY = 'SELECT %s FROM pacientes_activos ORDER BY %s %s LIMIT %s, %s;';
 
+    const PURGE_ALL_QUERY = 'DELETE FROM pacientes WHERE purge = 1';
+
     public function __construct(ContainerInterface $container = null, $params = [])
     {
         try {
@@ -116,5 +118,16 @@ class Patient
     public function getAll($params = [])
     {
         return $this->_getAll($params);
+    }
+
+    private function _deleteAll()
+    {
+        $this->_dbClient->where('purged', 1);
+        return $this->_dbClient->delete('pacientes');
+    }
+
+    public function deleteAll()
+    {
+        return $this->_deleteAll();
     }
 }
