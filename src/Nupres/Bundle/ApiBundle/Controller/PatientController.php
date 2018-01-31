@@ -308,7 +308,9 @@ class PatientController extends Controller
 
         try {
             $debugger = $this->container->get('nupres.dumper.service');
-            //$debugger::debugger('esto es una prueba' . (array('1' => 2))); die;
+
+            $debugger::debugger('buuuu', array('1' => 2));
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
