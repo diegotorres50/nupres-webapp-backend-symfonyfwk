@@ -27,11 +27,12 @@ class Dumper
         if (boolval(self::$_request->getQueryString('debugger'))) {
             echo '[DEBUGGER ' . date('YmdHis', time()) . ' ' . (microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) . '] ';
             if (!empty($log)) {
-                echo $log . '<br>';
+                echo $log . PHP_EOL;
             }
             if (!empty($context)) {
                 print_r($context);
             }
+            echo PHP_EOL;
         }
     }
 }

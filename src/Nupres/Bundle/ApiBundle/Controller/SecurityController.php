@@ -22,6 +22,12 @@ class SecurityController extends Controller
         $params = array();
 
         try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API loginAction');
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
@@ -73,6 +79,9 @@ class SecurityController extends Controller
                 throw new \Exception("factory no fue encontrado");
             }
 
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS: ', $params);
+
             // Invocamos el servicio de autenticacion de usuarios
             $authService = new Auth($this->container, $params);
 
@@ -98,7 +107,8 @@ class SecurityController extends Controller
                 //Si la sesion ya existe, no mostramos el formulario de login
                 if ($request->getSession()->has($database . '.' . $username) &&
                     !empty($request->getSession()->has($database . '.' . $username))) {
-                    // FIXME Aqui debo hacer un clear o logout de la session
+                    // FIXME Aqui debo hacer un clear o logout de la session para invalidar la session actual
+                    //$request->getSession()->clear();
                 } else {
                     // Creamos la session
                     $session=$request->getSession();
@@ -170,6 +180,12 @@ class SecurityController extends Controller
         $feedback = array();
 
         try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API logoutAction');
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
@@ -251,6 +267,12 @@ class SecurityController extends Controller
         $feedback = array();
 
         try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API isloggedinAction');
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
@@ -348,6 +370,12 @@ class SecurityController extends Controller
         $feedback = array();
 
         try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API jwtDecodeAction');
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 

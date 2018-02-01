@@ -35,10 +35,6 @@ class Patient
 
     private function _add($params = [])
     {
-        if (boolval($this->_request->getQueryString('debugger'))) {
-            dump($params);
-        }
-
         if (empty($params['id'])) {
             $params['id'] = 'NULL';
         }
@@ -89,10 +85,6 @@ class Patient
 
         if ($patient = $this->_dbClient->insert($database . '.' . $this->_dbEntities['TABLE_PACIENTES'], $data)) {
             return $patient;
-        } elseif (boolval($this->_request->getQueryString('debugger'))) {
-            $dumper = $this->_dumper;
-            $dumper::dump($this->_dbClient->getLastQuery());
-            $dumper::dump($this->_dbClient->getLastError());
         }
     }
 

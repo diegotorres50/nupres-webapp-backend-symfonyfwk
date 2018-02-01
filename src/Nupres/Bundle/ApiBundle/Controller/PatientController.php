@@ -26,6 +26,12 @@ class PatientController extends Controller
         $params = array();
 
         try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API addAction');
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
@@ -146,6 +152,9 @@ class PatientController extends Controller
                 $params['altura_rodilla'] = $alturaRodilla;
             }
 
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS:', $params);
+
             // Invocamos el servicio de pacientes
             $patientService = new Patient($this->container, $params);
 
@@ -197,6 +206,12 @@ class PatientController extends Controller
         $params = array();
 
         try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API getAllAction');
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
@@ -253,6 +268,10 @@ class PatientController extends Controller
 
             // $apellidos del paciente
             $params['order_by_sort'] = trim($request->query->get('order_by_sort', 'ASC'));
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS: ', $params);
+
             // Obtenemos todos los parametros recibidos por post
             $feedback['entry'] = $request->query->all();
 
@@ -307,9 +326,11 @@ class PatientController extends Controller
         $params = array();
 
         try {
+            // Servicio para imprimir debugger
             $debugger = $this->container->get('nupres.dumper.service');
 
-            $debugger::debugger('buuuu', array('1' => 2));
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API purgeAction');
 
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
@@ -352,6 +373,9 @@ class PatientController extends Controller
 
             // Obtenemos del objeto usuario la info de la bd a la que se conectara
             $params['database'] = $userService->getDbName();
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS: ', $params);
 
             // Obtenemos todos los parametros recibidos por post
             $feedback['entry'] = $request->query->all();
@@ -407,6 +431,12 @@ class PatientController extends Controller
         $params = array();
 
         try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API deleteAction');
+
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
 
@@ -456,6 +486,9 @@ class PatientController extends Controller
             if (empty($id)) {
                 throw new \Exception("id no fue encontrado");
             }
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS: ', array_merge($params, array('id' => $id)));
 
             // Obtenemos todos los parametros recibidos por post
             $feedback['entry'] = $request->query->all();
