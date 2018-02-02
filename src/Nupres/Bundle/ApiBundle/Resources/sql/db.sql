@@ -182,6 +182,11 @@ CREATE TABLE `pacientes` (
   `talla` decimal(3,2) unsigned NOT NULL,
   `media_envergadura` decimal(3,1) unsigned DEFAULT NULL,
   `altura_rodilla` varchar(45) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` varchar(45) DEFAULT NULL,
+  `modified_at` datetime DEFAULT NULL,
+  `modified_by` varchar(45) DEFAULT NULL,
+  `purged` bit(1) DEFAULT b'0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -192,9 +197,34 @@ CREATE TABLE `pacientes` (
 
 LOCK TABLES `pacientes` WRITE;
 /*!40000 ALTER TABLE `pacientes` DISABLE KEYS */;
-INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`) VALUES (80123858,'Diego','Torres','M','1981-06-17',1.68,NULL,NULL),(125434455,'Mariana','Torres','F','2006-09-12',1.68,NULL,NULL);
+INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`, `created_at`, `created_by`, `modified_at`, `modified_by`, `purged`) VALUES (12345606,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345607,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345608,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345611,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(80123858,'Diego','Torres','M','1981-06-17',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0'),(125434455,'Mariana','Torres','F','2006-09-12',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0');
 /*!40000 ALTER TABLE `pacientes` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Temporary table structure for view `pacientes_activos`
+--
+
+DROP TABLE IF EXISTS `pacientes_activos`;
+/*!50001 DROP VIEW IF EXISTS `pacientes_activos`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE TABLE `pacientes_activos` (
+  `id` tinyint NOT NULL,
+  `nombres` tinyint NOT NULL,
+  `apellidos` tinyint NOT NULL,
+  `genero` tinyint NOT NULL,
+  `fecha_nacimiento` tinyint NOT NULL,
+  `talla` tinyint NOT NULL,
+  `media_envergadura` tinyint NOT NULL,
+  `altura_rodilla` tinyint NOT NULL,
+  `created_at` tinyint NOT NULL,
+  `created_by` tinyint NOT NULL,
+  `modified_at` tinyint NOT NULL,
+  `modified_by` tinyint NOT NULL,
+  `purged` tinyint NOT NULL
+) ENGINE=MyISAM */;
+SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `ref-dx`
@@ -690,6 +720,25 @@ DELIMITER ;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `pacientes_activos`
+--
+
+/*!50001 DROP TABLE IF EXISTS `pacientes_activos`*/;
+/*!50001 DROP VIEW IF EXISTS `pacientes_activos`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 */
+/*!50001 VIEW `pacientes_activos` AS select `pacientes`.`id` AS `id`,`pacientes`.`nombres` AS `nombres`,`pacientes`.`apellidos` AS `apellidos`,`pacientes`.`genero` AS `genero`,`pacientes`.`fecha_nacimiento` AS `fecha_nacimiento`,`pacientes`.`talla` AS `talla`,`pacientes`.`media_envergadura` AS `media_envergadura`,`pacientes`.`altura_rodilla` AS `altura_rodilla`,`pacientes`.`created_at` AS `created_at`,`pacientes`.`created_by` AS `created_by`,`pacientes`.`modified_at` AS `modified_at`,`pacientes`.`modified_by` AS `modified_by`,`pacientes`.`purged` AS `purged` from `pacientes` where (`pacientes`.`purged` = 0) order by `pacientes`.`created_at` desc */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -700,4 +749,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-26 14:56:55
+-- Dump completed on 2018-01-30 17:05:52

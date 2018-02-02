@@ -6,14 +6,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
+// Para verificar si el usuario tiene session activa
 use Nupres\Bundle\ApiBundle\Model\Security\Auth;
+
+// Para hacer CRUD de la tabla pacientes
+use Nupres\Bundle\ApiBundle\Model\Operation\Patient;
 
 // Para obtener datos del objeto usuario
 use Nupres\Bundle\ApiBundle\Model\Operation\User;
 
-class SecurityController extends Controller
+class PatientController extends Controller
 {
-    public function loginAction(Request $request)
+    public function addAction(Request $request)
     {
         // $feedback para construir la respuesta de la api
         $feedback = array();
@@ -26,7 +30,7 @@ class SecurityController extends Controller
             $debugger = $this->container->get('nupres.dumper.service');
 
             // Escribiendo log en modo debugger
-            $debugger::debugger('INICIO API loginAction');
+            $debugger::debugger('INICIO API addAction');
 
             // Obtenemos del header la api key para validar el acceso
             $apiKey = $request->headers->get('Authorization');
@@ -46,386 +50,470 @@ class SecurityController extends Controller
 
             // Obtenemos por post los parametros del body / application/x-www-form-urlencoded
 
-            // $username es el user_id o user_mail en base de datos
-            $username = trim($request->request->get('username', null));
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $userhash = trim($request->request->get('userhash', null));
 
-            // $password es la clave del usuario en base de datos
-            $password = trim($request->request->get('password', null));
-
-            // Cada cliente tendra una base de datos (factory) independiente
-            $database = trim($request->request->get('factory', null));
-
-            // Obtenemos todos los parametros recibidos por post
-            $feedback['entry'] = $request->request->all();
-
-            // Validamos que exista el username en el request
-            if (!empty($username)) {
-                $params['username'] = $username;
+            // Validamos que exista el userhash en el request
+            if (empty($userhash)) {
+                throw new \Exception("userhash no fue encontrado");
             } else {
-                throw new \Exception("username no fue encontrado");
+                $params['userhash'] = $userhash;
             }
-
-            // Validamos que exista la clave en el request
-            if (!empty($password)) {
-                $params['password'] = $password;
-            } else {
-                throw new \Exception("clave no fue encontrada");
-            }
-
-            // Validamos que exista la base de datos en el request
-            if (!empty($database)) {
-                $params['database'] = $database;
-            } else {
-                throw new \Exception("factory no fue encontrado");
-            }
-
-            // Escribiendo log en modo debugger
-            $debugger::debugger('API PARAMS: ', $params);
 
             // Invocamos el servicio de autenticacion de usuarios
             $authService = new Auth($this->container, $params);
 
-            // Tratamos de hacer login al usuario
-            $userData = $authService->login($params);
-
-            // Si el servicio nos ha devuelto datos
-            if (is_array($userData) and !empty($userData)) {
-                // Obtenemos el array del primer registro devuelto de la query
-                $userData = $userData[0];
-
-                // Invocamos el servicio jwt para encriptar datos
-                $jwTokenService = $this->container->get('nupres.jwt.service');
-
-                // Encriptamos la informacion del usuario
-                $data = $jwTokenService::encode(
-                    array_merge(
-                        $userData,
-                        array('time' => time()) // time() es para cambiar el token
-                    )
-                );
-
-                //Si la sesion ya existe, no mostramos el formulario de login
-                if ($request->getSession()->has($database . '.' . $username) &&
-                    !empty($request->getSession()->has($database . '.' . $username))) {
-                    // FIXME Aqui debo hacer un clear o logout de la session para invalidar la session actual
-                    //$request->getSession()->clear();
-                } else {
-                    // Creamos la session
-                    $session=$request->getSession();
-                    // Creamos una llave valor para identificar la sesion de manera unica
-                    // y guardamos mas data
-                    $session->set(
-                        $database . '.' . $username,
-                        array(
-                            'user_info' => $userData,
-                            'database'  => $database
-                        )
-                    );
-                }
-
-                // Creamos un userhash encriptado para re usarlo en todas las apis que requieran autenticar el usuario para verificar si tiene session activa
-                $userHash = $jwTokenService::encode(
-                    array(
-                        'session_id'    => $request->getSession()->getId(),
-                        'database'      => $database,
-                        'username'      => $username,
-                        'time'          => time()
-                    )
-                );
-            } else {
-                throw new \Exception("usuario o clave invalida");
-            }
-
-            // Terminamos de construir la respuesta de la api
-            $feedback['status'] = 1;
-            $feedback['msg'] = 'Okey';
-            $feedback['code'] = 200;
-            $feedback['data']['hash'] = $userHash;
-            $feedback['data']['info'] = $data;
-
-            // Retornamos un http response
-            $response = new Response();
-            $response->setContent(json_encode($feedback));
-            $response->headers->set('Content-Type', 'application/json');
-
-            return $response;
-        } catch (\Exception $e) {
-            // Para los errores controlados, cosntruimos la respuesta
-            $feedback['status'] = 0;
-            $feedback['msg'] = 'Error';
-            $feedback['code'] = 400;
-            $feedback['data'] = null;
-            $feedback['error'] = array();
-            $feedback['error']['code'] = $e->getCode();
-            $feedback['error']['message'] = $e->getMessage();
-            $feedback['error']['line'] = $e->getLine();
-            $feedback['error']['file'] = $e->getFile();
-            $feedback['error']['method'] = __METHOD__;
-            $feedback['error']['trace'] = $e->__toString();
-
-            // Respondemos un error controlado
-            return new Response(
-                json_encode($feedback),
-                200,
-                array(
-                    'Content-Type' => 'application/json'
-                )
-            );
-        }
-    }
-
-    public function logoutAction(Request $request)
-    {
-        // $feedback para construir la respuesta de la api
-        $feedback = array();
-
-        try {
-            // Servicio para imprimir debugger
-            $debugger = $this->container->get('nupres.dumper.service');
-
-            // Escribiendo log en modo debugger
-            $debugger::debugger('INICIO API logoutAction');
-
-            // Obtenemos del header la api key para validar el acceso
-            $apiKey = $request->headers->get('Authorization');
-
-            // Retornamos error de parametros si no se especifica credencial de acceso
-            if (empty($apiKey)) {
-                throw new \Exception("Error de credenciales");
-            }
-
-            // Invocamos el servicio que valida las credenciales de la api
-            $credentialsService = $this->container->get('nupres.credentials.service');
-
-            // Verificamos las credenciales de acceso usando la decodificacion base64
-            if (!$credentialsService::checked($this->container, $apiKey)) {
-                throw new \Exception("No autorizado");
-            }
-
-            // Obtenemos todos los parametros recibidos por post
-            $feedback['entry'] = $request->query->all();
-
-            // $userHash es el objeto encriptado del usuario cuando hizo login
-            $userhash = trim($request->query->get('userhash', null));
-
-            // Validamos que exista el userhash en el request
-            if (empty($userhash)) {
-                throw new \Exception("userhash no fue encontrado");
-            }
-
-            // Invocamos el servicio de autenticacion de usuarios
-            $authService = new Auth($this->container, ['userhash' => $userhash]);
-
             // Validamos si el usuario tiene session activa
-            if ($authService->isLoggedIn($userhash)) {
-                //Cerramos ahora la sesion en el navegador
-                $request->getSession()->clear();
-            } else {
+            if (!$authService->isLoggedIn($userhash)) {
                 throw new \Exception("El usuario no esta loggeado");
             }
 
-            // Terminamos de construir la respuesta de la api
-            $feedback['status'] = 1;
-            $feedback['msg'] = 'Okey';
-            $feedback['code'] = 200;
-            $feedback['data'] = 1;
+            // Invocamos el servicio de gestion de usuarios
+            $userService = new User($this->container, $userhash);
 
-            // Retornamos un http response
-            $response = new Response();
-            $response->setContent(json_encode($feedback));
-            $response->headers->set('Content-Type', 'application/json');
+            // Obtenemos del objeto usuario la info de la bd a la que se conectara
+            $params['database'] = $userService->getDbName();
 
-            return $response;
-        } catch (\Exception $e) {
-            // Para los errores controlados, cosntruimos la respuesta
-            $feedback['status'] = 0;
-            $feedback['msg'] = 'Error';
-            $feedback['code'] = 400;
-            $feedback['data'] = null;
-            $feedback['error'] = array();
-            $feedback['error']['code'] = $e->getCode();
-            $feedback['error']['message'] = $e->getMessage();
-            $feedback['error']['line'] = $e->getLine();
-            $feedback['error']['file'] = $e->getFile();
-            $feedback['error']['method'] = __METHOD__;
-            $feedback['error']['trace'] = $e->__toString();
+            // $id es el documento del paciente
+            $id = trim($request->request->get('id', null));
 
-            // Respondemos un error controlado
-            return new Response(
-                json_encode($feedback),
-                200,
-                array(
-                    'Content-Type' => 'application/json'
-                )
-            );
-        }
-    }
+            // $nombres del paciente
+            $nombres = trim($request->request->get('nombres', null));
 
-    public function isloggedinAction(Request $request)
-    {
-        // $feedback para construir la respuesta de la api
-        $feedback = array();
+            // $apellidos del paciente
+            $apellidos = trim($request->request->get('apellidos', null));
 
-        try {
-            // Servicio para imprimir debugger
-            $debugger = $this->container->get('nupres.dumper.service');
+            // $genero del paciente
+            $genero = trim($request->request->get('genero', null));
 
-            // Escribiendo log en modo debugger
-            $debugger::debugger('INICIO API isloggedinAction');
+            // $fechaNacimiento del paciente
+            $fechaNacimiento = trim($request->request->get('fecha_nacimiento', null));
+            // $talla del paciente
+            $talla = trim($request->request->get('talla', null));
 
-            // Obtenemos del header la api key para validar el acceso
-            $apiKey = $request->headers->get('Authorization');
+            // $mediaEnvergadura del paciente
+            $mediaEnvergadura = trim($request->request->get('media_envergadura', null));
 
-            // Retornamos error de parametros si no se especifica credencial de acceso
-            if (empty($apiKey)) {
-                throw new \Exception("Error de credenciales");
-            }
-
-            // Invocamos el servicio que valida las credenciales de la api
-            $credentialsService = $this->container->get('nupres.credentials.service');
-
-            // Verificamos las credenciales de acceso usando la decodificacion base64
-            if (!$credentialsService::checked($this->container, $apiKey)) {
-                throw new \Exception("No autorizado");
-            }
+            // $alturaRodilla del paciente
+            $alturaRodilla = trim($request->request->get('altura_rodilla', null));
 
             // Obtenemos todos los parametros recibidos por post
-            $feedback['entry'] = $request->query->all();
-
-            // $userHash es el objeto encriptado del usuario cuando hizo login
-            $userhash = trim($request->query->get('userhash', null));
-
-            // Validamos que exista el userhash en el request
-            if (empty($userhash)) {
-                throw new \Exception("userhash no fue encontrado");
-            }
-
-            // Invocamos el servicio de autenticacion de usuarios
-            $authService = new Auth($this->container, ['userhash' => $userhash]);
-
-            // Validamos si el usuario tiene session activa
-            if ($authService->isLoggedIn($userhash)) {
-                // Recuperamos los datos en session.
-                // @TODO si los datos de un usuario se actualizan, debemos actualizar la session
-                // Invocamos el servicio de gestion de usuarios
-                $userService = new User($this->container, $userhash);
-
-                // Obtenemos del objeto usuario la info de la bd a la que se conectara
-                $userData = $userService->getDataFromSession();
-
-                // Invocamos el servicio del jwt
-                $jwTokenService = $this->container->get('nupres.jwt.service');
-
-                // Encriptamos la informacion del usuario
-                $data = $jwTokenService::encode(
-                    array_merge(
-                        $userData,
-                        array('time' => time()) // time() es para cambiar el token
-                    )
-                );
-            } else {
-                throw new \Exception("El usuario no esta loggeado");
-            }
-
-            // Terminamos de construir la respuesta de la api
-            $feedback['status'] = 1;
-            $feedback['msg'] = 'Okey';
-            $feedback['code'] = 200;
-            $feedback['data'] = $data;
-
-            // Retornamos un http response
-            $response = new Response();
-            $response->setContent(json_encode($feedback));
-            $response->headers->set('Content-Type', 'application/json');
-
-            return $response;
-        } catch (\Exception $e) {
-            // Para los errores controlados, cosntruimos la respuesta
-            $feedback['status'] = 0;
-            $feedback['msg'] = 'Error';
-            $feedback['code'] = 400;
-            $feedback['data'] = null;
-            $feedback['error'] = array();
-            $feedback['error']['code'] = $e->getCode();
-            $feedback['error']['message'] = $e->getMessage();
-            $feedback['error']['line'] = $e->getLine();
-            $feedback['error']['file'] = $e->getFile();
-            $feedback['error']['method'] = __METHOD__;
-            $feedback['error']['trace'] = $e->__toString();
-
-            // Respondemos un error controlado
-            return new Response(
-                json_encode($feedback),
-                200,
-                array(
-                    'Content-Type' => 'application/json'
-                )
-            );
-        }
-    }
-
-    public function jwtDecodeAction(Request $request)
-    {
-        // Respuesta a entregar
-        $feedback = array();
-
-        try {
-            // Servicio para imprimir debugger
-            $debugger = $this->container->get('nupres.dumper.service');
-
-            // Escribiendo log en modo debugger
-            $debugger::debugger('INICIO API jwtDecodeAction');
-
-            // Obtenemos del header la api key para validar el acceso
-            $apiKey = $request->headers->get('Authorization');
-
-            // Retornamos error de parametros si no se especifica credencial de acceso
-            if (empty($apiKey)) {
-                throw new \Exception("Error de credenciales");
-            }
-
-            // Invocamos el servicio que valida las credenciales de la api
-            $credentialsService = $this->container->get('nupres.credentials.service');
-
-            // Verificamos las credenciales de acceso usando la decodificacion base64
-            if (!$credentialsService::checked($this->container, $apiKey)) {
-                throw new \Exception("No autorizado");
-            }
-
-            // Obtenemos por post los valores de conexion
-            $token = trim($request->request->get('token', null));
-
-            $secretKey = trim($request->request->get('secret_key', null));
-
-            // Construimos parcialmente la respuesta
             $feedback['entry'] = $request->request->all();
 
-            // Validamos datos de entrada
-            if (empty($token)) {
-                throw new \Exception("token no fue encontrado");
+            // Validamos que exista el id en el request
+            if (!empty($id)) {
+                $params['id'] = $id;
+            } else {
+                throw new \Exception("id no fue encontrado");
             }
 
-            if (empty($secretKey)) {
-                throw new \Exception("secret_key no fue encontrado");
+            // Validamos que exista nombres en el request
+            if (!empty($nombres)) {
+                $params['nombres'] = $nombres;
+            } else {
+                throw new \Exception("nombres no fue encontrado");
             }
 
-            $jwTokenService = $this->container->get('nupres.jwt.service');
+            // Validamos que exista apellidos en el request
+            if (!empty($apellidos)) {
+                $params['apellidos'] = $apellidos;
+            } else {
+                throw new \Exception("apellidos no fue encontrado");
+            }
 
-            $data = $jwTokenService::decode($token, $secretKey);
+            // Validamos que exista genero en el request
+            if (!empty($genero)) {
+                $params['genero'] = $genero;
+            } else {
+                throw new \Exception("genero no fue encontrado");
+            }
 
+            // Validamos que exista fechaNacimiento en el request
+            if (!empty($fechaNacimiento)) {
+                $params['fecha_nacimiento'] = $fechaNacimiento;
+            } else {
+                throw new \Exception("fecha_nacimiento no fue encontrado");
+            }
+
+            // Validamos que exista talla en el request
+            if (!empty($talla)) {
+                $params['talla'] = $talla;
+            } else {
+                throw new \Exception("talla no fue encontrado");
+            }
+
+            // Validamos que exista mediaEnvergadura en el request
+            if (!empty($mediaEnvergadura)) {
+                $params['media_envergadura'] = $mediaEnvergadura;
+            }
+
+            // Validamos que exista alturaRodilla en el request
+            if (!empty($alturaRodilla)) {
+                $params['altura_rodilla'] = $alturaRodilla;
+            }
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS:', $params);
+
+            // Invocamos el servicio de pacientes
+            $patientService = new Patient($this->container, $params);
+
+            $data = $patientService->add($params);
+
+            // Terminamos de construir la respuesta de la api
             $feedback['status'] = 1;
             $feedback['msg'] = 'Okey';
             $feedback['code'] = 200;
-            $feedback['data'] = $data;
+            $feedback['data'] = intval($data);
 
+            // Retornamos un http response
             $response = new Response();
             $response->setContent(json_encode($feedback));
             $response->headers->set('Content-Type', 'application/json');
 
             return $response;
         } catch (\Exception $e) {
+            // Para los errores controlados, cosntruimos la respuesta
             $feedback['status'] = 0;
+            $feedback['msg'] = 'Error';
+            $feedback['code'] = 400;
+            $feedback['data'] = null;
+            $feedback['error'] = array();
+            $feedback['error']['code'] = $e->getCode();
+            $feedback['error']['message'] = $e->getMessage();
+            $feedback['error']['line'] = $e->getLine();
+            $feedback['error']['file'] = $e->getFile();
+            $feedback['error']['method'] = __METHOD__;
+            $feedback['error']['trace'] = $e->__toString();
+
+            // Respondemos un error controlado
+            return new Response(
+                json_encode($feedback),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+        }
+    }
+
+    public function getAllAction(Request $request)
+    {
+        // $feedback para construir la respuesta de la api
+        $feedback = array();
+
+        // $params para construir los parametros que requiere el model
+        $params = array();
+
+        try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API getAllAction');
+
+            // Obtenemos del header la api key para validar el acceso
+            $apiKey = $request->headers->get('Authorization');
+
+            // Retornamos error de parametros si no se especifica credencial de acceso
+            if (empty($apiKey)) {
+                throw new \Exception("Error de credenciales");
+            }
+
+            // Invocamos el servicio que valida las credenciales de la api
+            $credentialsService = $this->container->get('nupres.credentials.service');
+
+            // Verificamos las credenciales de acceso usando la decodificacion base64
+            if (!$credentialsService::checked($this->container, $apiKey)) {
+                throw new \Exception("No autorizado");
+            }
+
+            // Obtenemos por post los parametros del body / application/x-www-form-urlencoded
+
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $userhash = trim($request->query->get('userhash', null));
+
+            // Validamos que exista el userhash en el request
+            if (empty($userhash)) {
+                throw new \Exception("userhash no fue encontrado");
+            } else {
+                $params['userhash'] = $userhash;
+            }
+
+            // Invocamos el servicio de autenticacion de usuarios
+            $authService = new Auth($this->container, $params);
+
+            // Validamos si el usuario tiene session activa
+            if (!$authService->isLoggedIn($userhash)) {
+                throw new \Exception("El usuario no esta loggeado");
+            }
+
+            // Invocamos el servicio de gestion de usuarios
+            $userService = new User($this->container, $userhash);
+
+            // Obtenemos del objeto usuario la info de la bd a la que se conectara
+            $params['database'] = $userService->getDbName();
+
+            // $id es el documento del paciente
+            $params['fields'] = trim($request->query->get('fields', '*'));
+
+            // $id es el documento del paciente
+            $params['offset'] = trim($request->query->get('offset', 0));
+
+            // $nombres del paciente
+            $params['count'] = trim($request->query->get('count', 1));
+
+            // $apellidos del paciente
+            $params['order_by_column'] = trim($request->query->get('order_by_column', 1));
+
+            // $apellidos del paciente
+            $params['order_by_sort'] = trim($request->query->get('order_by_sort', 'ASC'));
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS: ', $params);
+
+            // Obtenemos todos los parametros recibidos por post
+            $feedback['entry'] = $request->query->all();
+
+            // Invocamos el servicio de pacientes
+            $patientService = new Patient($this->container, $params);
+
+            $data = $patientService->getAll($params);
+
+            // Terminamos de construir la respuesta de la api
+            $feedback['status'] = 1;
             $feedback['msg'] = 'Okey';
+            $feedback['code'] = 200;
+            $feedback['data'] = $data;
+
+            // Retornamos un http response
+            $response = new Response();
+            $response->setContent(json_encode($feedback));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        } catch (\Exception $e) {
+            // Para los errores controlados, cosntruimos la respuesta
+            $feedback['status'] = 0;
+            $feedback['msg'] = 'Error';
+            $feedback['code'] = 400;
+            $feedback['data'] = null;
+            $feedback['error'] = array();
+            $feedback['error']['code'] = $e->getCode();
+            $feedback['error']['message'] = $e->getMessage();
+            $feedback['error']['line'] = $e->getLine();
+            $feedback['error']['file'] = $e->getFile();
+            $feedback['error']['method'] = __METHOD__;
+            $feedback['error']['trace'] = $e->__toString();
+
+            // Respondemos un error controlado
+            return new Response(
+                json_encode($feedback),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+        }
+    }
+
+    public function purgeAction(Request $request)
+    {
+        // $feedback para construir la respuesta de la api
+        $feedback = array();
+
+        // $params para construir los parametros que requiere el model
+        $params = array();
+
+        try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API purgeAction');
+
+            // Obtenemos del header la api key para validar el acceso
+            $apiKey = $request->headers->get('Authorization');
+
+            // Retornamos error de parametros si no se especifica credencial de acceso
+            if (empty($apiKey)) {
+                throw new \Exception("Error de credenciales");
+            }
+
+            // Invocamos el servicio que valida las credenciales de la api
+            $credentialsService = $this->container->get('nupres.credentials.service');
+
+            // Verificamos las credenciales de acceso usando la decodificacion base64
+            if (!$credentialsService::checked($this->container, $apiKey)) {
+                throw new \Exception("No autorizado");
+            }
+
+            // Obtenemos por post los parametros del body / application/x-www-form-urlencoded
+
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $userhash = trim($request->query->get('userhash', null));
+
+            // Validamos que exista el userhash en el request
+            if (empty($userhash)) {
+                throw new \Exception("userhash no fue encontrado");
+            } else {
+                $params['userhash'] = $userhash;
+            }
+
+            // Invocamos el servicio de autenticacion de usuarios
+            $authService = new Auth($this->container, $params);
+
+            // Validamos si el usuario tiene session activa
+            if (!$authService->isLoggedIn($userhash)) {
+                throw new \Exception("El usuario no esta loggeado");
+            }
+
+            // Invocamos el servicio de gestion de usuarios
+            $userService = new User($this->container, $userhash);
+
+            // Obtenemos del objeto usuario la info de la bd a la que se conectara
+            $params['database'] = $userService->getDbName();
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS: ', $params);
+
+            // Obtenemos todos los parametros recibidos por post
+            $feedback['entry'] = $request->query->all();
+
+            // Invocamos el servicio de pacientes
+            $patientService = new Patient($this->container, $params);
+
+            $data = $patientService->deleteAll();
+
+            // Terminamos de construir la respuesta de la api
+            $feedback['status'] = 1;
+            $feedback['msg'] = 'Okey';
+            $feedback['code'] = 200;
+            $feedback['data'] = intval($data);
+
+            // Retornamos un http response
+            $response = new Response();
+            $response->setContent(json_encode($feedback));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        } catch (\Exception $e) {
+            // Para los errores controlados, cosntruimos la respuesta
+            $feedback['status'] = 0;
+            $feedback['msg'] = 'Error';
+            $feedback['code'] = 400;
+            $feedback['data'] = null;
+            $feedback['error'] = array();
+            $feedback['error']['code'] = $e->getCode();
+            $feedback['error']['message'] = $e->getMessage();
+            $feedback['error']['line'] = $e->getLine();
+            $feedback['error']['file'] = $e->getFile();
+            $feedback['error']['method'] = __METHOD__;
+            $feedback['error']['trace'] = $e->__toString();
+
+            // Respondemos un error controlado
+            return new Response(
+                json_encode($feedback),
+                200,
+                array(
+                    'Content-Type' => 'application/json'
+                )
+            );
+        }
+    }
+
+    public function deleteAction(Request $request)
+    {
+        // $feedback para construir la respuesta de la api
+        $feedback = array();
+
+        // $params para construir los parametros que requiere el model
+        $params = array();
+
+        try {
+            // Servicio para imprimir debugger
+            $debugger = $this->container->get('nupres.dumper.service');
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('INICIO API deleteAction');
+
+            // Obtenemos del header la api key para validar el acceso
+            $apiKey = $request->headers->get('Authorization');
+
+            // Retornamos error de parametros si no se especifica credencial de acceso
+            if (empty($apiKey)) {
+                throw new \Exception("Error de credenciales");
+            }
+
+            // Invocamos el servicio que valida las credenciales de la api
+            $credentialsService = $this->container->get('nupres.credentials.service');
+
+            // Verificamos las credenciales de acceso usando la decodificacion base64
+            if (!$credentialsService::checked($this->container, $apiKey)) {
+                throw new \Exception("No autorizado");
+            }
+
+            // Obtenemos por post los parametros del body / application/x-www-form-urlencoded
+
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $userhash = trim($request->query->get('userhash', null));
+
+            // Validamos que exista el userhash en el request
+            if (empty($userhash)) {
+                throw new \Exception("userhash no fue encontrado");
+            } else {
+                $params['userhash'] = $userhash;
+            }
+
+            // Invocamos el servicio de autenticacion de usuarios
+            $authService = new Auth($this->container, $params);
+
+            // Validamos si el usuario tiene session activa
+            if (!$authService->isLoggedIn($userhash)) {
+                throw new \Exception("El usuario no esta loggeado");
+            }
+
+            // Invocamos el servicio de gestion de usuarios
+            $userService = new User($this->container, $userhash);
+
+            // Obtenemos del objeto usuario la info de la bd a la que se conectara
+            $params['database'] = $userService->getDbName();
+
+            // $userHash es el objeto encriptado del usuario cuando hizo login
+            $id = trim($request->query->get('id', null));
+
+            // Validamos que exista el userhash en el request
+            if (empty($id)) {
+                throw new \Exception("id no fue encontrado");
+            }
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('API PARAMS: ', array_merge($params, array('id' => $id)));
+
+            // Obtenemos todos los parametros recibidos por post
+            $feedback['entry'] = $request->query->all();
+
+            // Invocamos el servicio de pacientes
+            $patientService = new Patient($this->container, $params);
+
+            $data = $patientService->updateById($id, array('purged' => 1));
+
+            // Terminamos de construir la respuesta de la api
+            $feedback['status'] = 1;
+            $feedback['msg'] = 'Okey';
+            $feedback['code'] = 200;
+            $feedback['data'] = $data;
+
+            // Retornamos un http response
+            $response = new Response();
+            $response->setContent(json_encode($feedback));
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        } catch (\Exception $e) {
+            // Para los errores controlados, cosntruimos la respuesta
+            $feedback['status'] = 0;
+            $feedback['msg'] = 'Error';
             $feedback['code'] = 400;
             $feedback['data'] = null;
             $feedback['error'] = array();
