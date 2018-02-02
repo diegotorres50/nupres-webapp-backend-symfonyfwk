@@ -11,11 +11,9 @@ class Patient
 
     private $_container;
 
-    private $_request;
-
-    private $_dumper;
-
     private $_dbEntities;
+
+    private $_debugger;
 
     const GET_ALL_QUERY = 'SELECT %s FROM %s ORDER BY %s %s LIMIT %s, %s;';
 
@@ -24,17 +22,66 @@ class Patient
         try {
             $this->_container = $container;
             $this->_dbClient = MysqlClient::getInstance($container, $params);
-            $this->_request = $container->get('nupres.request.service');
-            $this->_dumper = $container->get('nupres.dumper.service');
             $dbEntitiesService = $container->get('nupres.db_entities.service');
             $this->_dbEntities = $dbEntitiesService::getDbEntities();
+            // Servicio para imprimir debugger
+            $this->_debugger = $container->get('nupres.dumper.service');
+            $debugger = $this->_debugger;
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger(
+                'CLASS INFO',
+                array(
+                    'CLASS'     => __CLASS__,
+                    'FILE'      => __FILE__,
+                    'METHOD'    => __METHOD__,
+                    'LINE'      => __LINE__
+                )
+            );
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('PARAMETERS', $params);
         } catch (\Exception $ex) {
+            // Escribiendo log en modo debugger
+            $debugger::debugger(
+                'EXCEPTION INFO',
+                array(
+                    'CLASS'     => __CLASS__,
+                    'METHOD'    => __METHOD__,
+                    'ERROR'     => array(
+                        'CODE'   => $ex->getCode(),
+                        'MSG'    => $ex->getMessage(),
+                        'LINE'   => $ex->getLine(),
+                        'FILE'   => $ex->getFile(),
+                        'TRACE'  => $ex->getMessage(),
+                        'MSG'    => $ex->__toString()
+                        )
+                )
+            );
+
             throw $ex;
         }
     }
 
     private function _add($params = [])
     {
+        // Servicio para imprimir debugger
+        $debugger = $this->_debugger;
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'GENERAL INFO',
+            array(
+                'CLASS'     => __CLASS__,
+                'FILE'      => __FILE__,
+                'METHOD'    => __METHOD__,
+                'LINE'      => __LINE__
+            )
+        );
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('PARAMETERS', $params);
+
         if (empty($params['id'])) {
             $params['id'] = 'NULL';
         }
@@ -78,10 +125,16 @@ class Patient
             'altura_rodilla'    => $params['altura_rodilla'],
         );
 
+        // Escribiendo log en modo debugger
+        $debugger::debugger('DATA', $data);
+
         $factoriesMapService = $this->_container->get('nupres.factories_map.service');
         $factoriesMap = $factoriesMapService::getFactoriesMap();
 
         $database = $factoriesMap[strtoupper($params['database'])];
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('DATABASE: '. $database);
 
         if ($patient = $this->_dbClient->insert($database . '.' . $this->_dbEntities['TABLE_PACIENTES'], $data)) {
             return $patient;
@@ -95,6 +148,23 @@ class Patient
 
     private function _getAll($params = [])
     {
+        // Servicio para imprimir debugger
+        $debugger = $this->_debugger;
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'GENERAL INFO',
+            array(
+                'CLASS'     => __CLASS__,
+                'FILE'      => __FILE__,
+                'METHOD'    => __METHOD__,
+                'LINE'      => __LINE__
+            )
+        );
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('PARAMETERS', $params);
+
         return $this->_dbClient->rawQuery(
             sprintf(
                 self::GET_ALL_QUERY,
@@ -126,6 +196,28 @@ class Patient
 
     private function _updateById($id, $params = [])
     {
+        // Servicio para imprimir debugger
+        $debugger = $this->_debugger;
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'GENERAL INFO',
+            array(
+                'CLASS'     => __CLASS__,
+                'FILE'      => __FILE__,
+                'METHOD'    => __METHOD__,
+                'LINE'      => __LINE__
+            )
+        );
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'VARS INFO',
+            array(
+                'id'       => $id,
+                'params'   => $params
+            )
+        );
 
         foreach ($params as $key => $value) {
             if ($key == 'id') {
@@ -133,6 +225,9 @@ class Patient
             }
             $data[$key] = $value;
         }
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('DATA', $data);
 
         $this->_dbClient->where('id', $id);
 

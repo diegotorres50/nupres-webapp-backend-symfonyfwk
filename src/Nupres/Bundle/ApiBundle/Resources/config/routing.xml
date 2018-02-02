@@ -30,4 +30,7 @@
   <route id="nupres_api_patient_delete" path="/patient/delete">
     <default key="_controller">NupresApiBundle:Patient:delete</default>
   </route>
+  <route id="nupres_api_config" path="/utils/config/getall">
+    <default key="_controller">NupresApiBundle:Config:getAll</default>
+  </route>
 </routes>

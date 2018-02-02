@@ -7,22 +7,53 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class User
 {
     private $_container;
-    private $_request;
-    private $_dumper;
     private $_jwt;
     private $_userhash;
     private $_session;
+    private $_debugger;
 
     public function __construct(ContainerInterface $container = null, $userhash = null)
     {
         try {
             $this->_container = $container;
-            $this->_request = $container->get('nupres.request.service');
-            $this->_dumper = $container->get('nupres.dumper.service');
             $this->_jwt = $container->get('nupres.jwt.service');
             $this->_userhash = $userhash;
             $this->_session = $container->get('session');
+            // Servicio para imprimir debugger
+            $this->_debugger = $container->get('nupres.dumper.service');
+            $debugger = $this->_debugger;
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger(
+                'CLASS INFO',
+                array(
+                    'CLASS'     => __CLASS__,
+                    'FILE'      => __FILE__,
+                    'METHOD'    => __METHOD__,
+                    'LINE'      => __LINE__
+                )
+            );
+
+            // Escribiendo log en modo debugger
+            $debugger::debugger('USERHASH: ' . $userhash);
         } catch (\Exception $ex) {
+            // Escribiendo log en modo debugger
+            $debugger::debugger(
+                'EXCEPTION INFO',
+                array(
+                    'CLASS'     => __CLASS__,
+                    'METHOD'    => __METHOD__,
+                    'ERROR'     => array(
+                        'CODE'   => $ex->getCode(),
+                        'MSG'    => $ex->getMessage(),
+                        'LINE'   => $ex->getLine(),
+                        'FILE'   => $ex->getFile(),
+                        'TRACE'  => $ex->getMessage(),
+                        'MSG'    => $ex->__toString()
+                        )
+                )
+            );
+
             throw $ex;
         }
     }
@@ -44,7 +75,24 @@ class User
 
     private function _getDataFromUserhash()
     {
+        // Servicio para imprimir debugger
+        $debugger = $this->_debugger;
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'GENERAL INFO',
+            array(
+                'CLASS'     => __CLASS__,
+                'FILE'      => __FILE__,
+                'METHOD'    => __METHOD__,
+                'LINE'      => __LINE__
+            )
+        );
+
         $secretKeyConfig = $this->_container->getParameter('nupres_config.jwt');
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('secretKeyConfig: ' . $secretKeyConfig);
 
         $jwtService = $this->_jwt;
 
