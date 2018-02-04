@@ -113,4 +113,9 @@ class User
     {
         return $this->_getDataFromSession();
     }
+
+    public function getUsername()
+    {
+        return $this->_getUsername();
+    }
 }
