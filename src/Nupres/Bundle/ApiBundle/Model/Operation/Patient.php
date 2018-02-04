@@ -17,6 +17,10 @@ class Patient
 
     const GET_ALL_QUERY = 'SELECT %s FROM %s ORDER BY %s %s LIMIT %s, %s;';
 
+    const BASIC_SEARCH_QUERY1 = "CALL procedure_findAll('%s', '%s', '%s', '%s', %s, %s);";
+
+    const BASIC_SEARCH_QUERY2 = "SELECT %s FROM TMP_%s;";
+
     public function __construct(ContainerInterface $container = null, $params = [])
     {
         try {
@@ -123,6 +127,8 @@ class Patient
             'genero'            => $params['genero'],
             'media_envergadura' => $params['media_envergadura'],
             'altura_rodilla'    => $params['altura_rodilla'],
+            'created_at'        => $params['created_at'],
+            'created_by'        => $params['created_by']
         );
 
         // Escribiendo log en modo debugger
@@ -240,5 +246,58 @@ class Patient
     public function updateById($id, $params = [])
     {
         return $this->_updateById($id, $params);
+    }
+
+    private function _basicSearch($params = [])
+    {
+        // Servicio para imprimir debugger
+        $debugger = $this->_debugger;
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'GENERAL INFO',
+            array(
+                'CLASS'     => __CLASS__,
+                'FILE'      => __FILE__,
+                'METHOD'    => __METHOD__,
+                'LINE'      => __LINE__
+            )
+        );
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('PARAMETERS', $params);
+
+        $factoriesMapService = $this->_container->get('nupres.factories_map.service');
+        $factoriesMap = $factoriesMapService::getFactoriesMap();
+
+        $params['database'] = $factoriesMap[strtoupper($params['database'])];
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('DATABASE: '. $params['database']);
+
+        $this->_dbClient->rawQuery(
+            sprintf(
+                self::BASIC_SEARCH_QUERY1,
+                $this->_dbEntities['VIEW_PACIENTES_ACTIVOS_BASICO'],
+                $params['database'],
+                $params['pattern'],
+                $params['order_by_column'],
+                $params['offset'],
+                $params['count']
+            )
+        );
+
+        return $this->_dbClient->rawQuery(
+            sprintf(
+                self::BASIC_SEARCH_QUERY2,
+                $params['fields'],
+                $this->_dbEntities['VIEW_PACIENTES_ACTIVOS_BASICO']
+            )
+        );
+    }
+
+    public function basicSearch($params = [])
+    {
+        return $this->_basicSearch($params);
     }
 }

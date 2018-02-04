@@ -10,6 +10,7 @@ class Entities
 {
     const TABLE_PACIENTES               = 'pacientes';
     const VIEW_PACIENTES_ACTIVOS        = 'pacientes_activos';
+    const VIEW_PACIENTES_ACTIVOS_BASICO = 'pacientes_activos_basico';
 
     public static function getDbEntities()
     {

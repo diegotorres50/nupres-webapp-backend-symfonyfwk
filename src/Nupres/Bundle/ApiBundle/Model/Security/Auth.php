@@ -100,6 +100,8 @@ class Auth
         //Si la sesion existe, entonces
         if ($session->has($userData->database . '.' . $userData->username)) {
             return true;
+        } else {
+            $debugger::debugger('WARNING - NO SE OBTUVO LA SESSION: ' . $userData->database . '.' . $userData->username);
         }
     }
 
