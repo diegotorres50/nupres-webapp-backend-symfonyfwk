@@ -149,7 +149,9 @@ class SecurityController extends Controller
             $response->headers->set('Content-Type', 'application/json');
 
             // Necesario para que desde angular evite el cross domain: https://ourcodeworld.com/articles/read/291/how-to-solve-the-client-side-access-control-allow-origin-request-error-with-your-own-symfony-3-api
-            $response->headers->set('Access-Control-Allow-Origin', 'http://localhost:4200');
+
+            // Allow all websites
+            $response->headers->set('Access-Control-Allow-Origin', '*');
 
             return $response;
         } catch (\Exception $e) {
