@@ -153,7 +153,7 @@ class SecurityController extends Controller
             // Allow all websites
             $response->headers->set('Access-Control-Allow-Origin', '*');
 
-            $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+            $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept, authorization, cache-control, content-type');
             $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
 
             return $response;
@@ -183,7 +183,7 @@ class SecurityController extends Controller
                 array(
                     'Content-Type'                  => 'application/json',
                     'Access-Control-Allow-Origin'   => '*',
-                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept',
+                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type',
                     'Access-Control-Allow-Methods'  => 'POST, GET, PUT, DELETE, PATCH, OPTIONS'
                 )
             );
