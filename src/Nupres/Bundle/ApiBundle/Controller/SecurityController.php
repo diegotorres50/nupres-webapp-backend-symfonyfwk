@@ -251,6 +251,14 @@ class SecurityController extends Controller
             $response->setContent(json_encode($feedback));
             $response->headers->set('Content-Type', 'application/json');
 
+            // Necesario para que desde angular evite el cross domain: https://ourcodeworld.com/articles/read/291/how-to-solve-the-client-side-access-control-allow-origin-request-error-with-your-own-symfony-3-api
+
+            // Allow all websites
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+
+            $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+            $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
+
             return $response;
         } catch (\Exception $e) {
             // Para los errores controlados, cosntruimos la respuesta
@@ -271,7 +279,10 @@ class SecurityController extends Controller
                 json_encode($feedback),
                 200,
                 array(
-                    'Content-Type' => 'application/json'
+                    'Content-Type'                  => 'application/json',
+                    'Access-Control-Allow-Origin'   => '*',
+                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept',
+                    'Access-Control-Allow-Methods'  => 'POST, GET, PUT, DELETE, PATCH, OPTIONS'
                 )
             );
         }
