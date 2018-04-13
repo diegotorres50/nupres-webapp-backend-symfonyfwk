@@ -183,7 +183,7 @@ class SecurityController extends Controller
                 array(
                     'Content-Type'                  => 'application/json',
                     'Access-Control-Allow-Origin'   => '*',
-                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type',
+                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type, credential',
                     'Access-Control-Allow-Methods'  => 'POST, GET, PUT, DELETE, PATCH, OPTIONS'
                 )
             );
@@ -281,7 +281,7 @@ class SecurityController extends Controller
                 array(
                     'Content-Type'                  => 'application/json',
                     'Access-Control-Allow-Origin'   => '*',
-                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type',
+                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type, credential',
                     'Access-Control-Allow-Methods'  => 'POST, GET, PUT, DELETE, PATCH, OPTIONS'
                 )
             );
@@ -395,7 +395,7 @@ class SecurityController extends Controller
                 array(
                     'Content-Type'                  => 'application/json',
                     'Access-Control-Allow-Origin'   => '*',
-                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type',
+                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type, credential',
                     'Access-Control-Allow-Methods'  => 'POST, GET, PUT, DELETE, PATCH, OPTIONS'
                 )
             );
@@ -489,7 +489,7 @@ class SecurityController extends Controller
                 array(
                     'Content-Type'                  => 'application/json',
                     'Access-Control-Allow-Origin'   => '*',
-                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type',
+                    'Access-Control-Allow-Headers'  => 'origin, content-type, accept, authorization, cache-control, content-type, credential',
                     'Access-Control-Allow-Methods'  => 'POST, GET, PUT, DELETE, PATCH, OPTIONS'
                 )
             );
