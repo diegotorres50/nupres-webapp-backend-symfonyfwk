@@ -96,14 +96,16 @@ class SecurityController extends Controller
                 // Invocamos el servicio jwt para encriptar datos
                 $jwTokenService = $this->container->get('nupres.jwt.service');
 
-                // Encriptamos la informacion del usuario
-                $data = $jwTokenService::encode(
-                    array_merge(
-                        $userData,
-                        array('time' => time()) // time() es para cambiar el token
-                    )
-                );
-
+                /*
+                @TODO @FIXME Encontre un problema con las sesiones tanto en local como en servergrove y es que los archivos de sesion se crean en el servidor pero al
+                parecer no quedan con permisos de escritura lo que ocasiona que no se guarde
+                la informacion de la sesion y cuando esto pasa... otras apis como por ejemplo
+                isloggedin desde el controlador o desde el auth model tratan de recuperar los datos de la sesion por una key y pues no encuentran datos, toca seguir
+                investigando, por el momento no voy a usar las sessions de php, solo
+                nos basaremos en el token jwt que se entregue al cliente y desde el cliente
+                persistir esta info que era lo que en principio queria que hiciera php, nos toca asi para poder seguir avanzando el front desde angular.
+                 */
+                /*
                 //Si la sesion ya existe, no mostramos el formulario de login
                 if ($request->getSession()->has($database . '.' . $username) &&
                     !empty($request->getSession()->has($database . '.' . $username))) {
@@ -121,15 +123,16 @@ class SecurityController extends Controller
                             'database'  => $database
                         )
                     );
-                }
+                }*/
 
                 // Creamos un userhash encriptado para re usarlo en todas las apis que requieran autenticar el usuario para verificar si tiene session activa
                 $userHash = $jwTokenService::encode(
                     array(
-                        'session_id'    => $request->getSession()->getId(),
+                        'session_id'    => 'Pendiente resolver bug de sessiones en php',
                         'database'      => $database,
                         'username'      => $username,
-                        'time'          => time()
+                        'time'          => time(),
+                        'extra'         => $userData
                     )
                 );
             } else {
@@ -141,7 +144,6 @@ class SecurityController extends Controller
             $feedback['msg'] = 'Okey';
             $feedback['code'] = 200;
             $feedback['data']['hash'] = $userHash;
-            $feedback['data']['info'] = $data;
 
             // Retornamos un http response
             $response = new Response();
@@ -232,10 +234,23 @@ class SecurityController extends Controller
             // Invocamos el servicio de autenticacion de usuarios
             $authService = new Auth($this->container, ['userhash' => $userhash]);
 
+            /*
+             @TODO @FIXME Encontre un problema con las sesiones tanto en local como en servergrove y es que los archivos de sesion se crean en el servidor pero al
+             parecer no quedan con permisos de escritura lo que ocasiona que no se guarde
+             la informacion de la sesion y cuando esto pasa... otras apis como por ejemplo
+             isloggedin desde el controlador o desde el auth model tratan de recuperar los datos de la sesion por una key y pues no encuentran datos, toca seguir
+             investigando, por el momento no voy a usar las sessions de php, solo
+             nos basaremos en el token jwt que se entregue al cliente y desde el cliente
+             persistir esta info que era lo que en principio queria que hiciera php, nos toca asi para poder seguir avanzando el front desde angular.
+            */
             // Validamos si el usuario tiene session activa
             if ($authService->isLoggedIn($userhash)) {
                 //Cerramos ahora la sesion en el navegador
-                $request->getSession()->clear();
+                //$request->getSession()->clear();
+                //
+                //@TODO @FIXME lo ideal seria que invalidaramos el jwt
+                //que los que usaremos por ahora mientras resolvemos
+                //el problema de las sesiones en php
             } else {
                 throw new \Exception("El usuario no esta loggeado");
             }
@@ -337,8 +352,17 @@ class SecurityController extends Controller
                 // Invocamos el servicio de gestion de usuarios
                 $userService = new User($this->container, $userhash);
 
-                // Obtenemos del objeto usuario la info de la bd a la que se conectara
-                $userData = $userService->getDataFromSession();
+                /*
+                 @TODO @FIXME Encontre un problema con las sesiones tanto en local como en servergrove y es que los archivos de sesion se crean en el servidor pero al
+                 parecer no quedan con permisos de escritura lo que ocasiona que no se guarde
+                 la informacion de la sesion y cuando esto pasa... otras apis como por ejemplo
+                 isloggedin desde el controlador o desde el auth model tratan de recuperar los datos de la sesion por una key y pues no encuentran datos, toca seguir
+                 investigando, por el momento no voy a usar las sessions de php, solo
+                 nos basaremos en el token jwt que se entregue al cliente y desde el cliente
+                 persistir esta info que era lo que en principio queria que hiciera php, nos toca asi para poder seguir avanzando el front desde angular.
+                */
+                // Obtenemos del objeto usuario la info que tenemos en sesion
+                /*$userData = $userService->getDataFromSession();
 
                 // Invocamos el servicio del jwt
                 $jwTokenService = $this->container->get('nupres.jwt.service');
@@ -349,16 +373,17 @@ class SecurityController extends Controller
                         $userData,
                         array('time' => time()) // time() es para cambiar el token
                     )
-                );
+                );*/
+                $data = $userhash;
             } else {
-                throw new \Exception("El usuario no esta loggeado");
+                throw new \Exception("El usuario no esta autenticado");
             }
 
             // Terminamos de construir la respuesta de la api
             $feedback['status'] = 1;
             $feedback['msg'] = 'Okey';
             $feedback['code'] = 200;
-            $feedback['data'] = $data;
+            $feedback['data'] = $data; // Por ahora retornamos el mismo hash
 
             // Retornamos un http response
             $response = new Response();
