@@ -125,6 +125,18 @@ class SecurityController extends Controller
                     );
                 }*/
 
+                // Invocamos el servicio de sessions que hicimos a pedal porque
+                // con symfony no se estan persistiendo las sessiones en files
+                $sessionService = $this->container->get('nupres.session.service');
+
+                $params['data'] = array(
+                                    'user_info' => $userData,
+                                    'database'  => $database
+                                );
+
+                // Tratamos de crear la session
+                $sessionService->create($params);
+
                 // Creamos un userhash encriptado para re usarlo en todas las apis que requieran autenticar el usuario para verificar si tiene session activa
                 $userHash = $jwTokenService::encode(
                     array(

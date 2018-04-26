@@ -27,6 +27,9 @@
         <service id="nupres.dumper.service" class="Nupres\Bundle\ApiBundle\Model\Common\Dumper">
             <argument type="service" id="service_container" />
         </service>
+        <service id="nupres.session.service" class="Nupres\Bundle\ApiBundle\Model\Security\Session">
+            <argument type="service" id="service_container" />
+        </service>
         <service id="nupres.db_entities.service" class="Nupres\Bundle\ApiBundle\Entity\Entities">
         </service>
     </services>
