@@ -140,7 +140,7 @@ class SecurityController extends Controller
                 // Creamos un userhash encriptado para re usarlo en todas las apis que requieran autenticar el usuario para verificar si tiene session activa
                 $userHash = $jwTokenService::encode(
                     array(
-                        'session_id'    => 'Pendiente resolver bug de sessiones en php',
+                        'session_id'    => $sessionService->getId(),
                         'database'      => $database,
                         'username'      => $username,
                         'time'          => time(),

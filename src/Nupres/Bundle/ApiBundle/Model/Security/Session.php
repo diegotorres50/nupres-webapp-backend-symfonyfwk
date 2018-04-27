@@ -15,6 +15,8 @@ class Session
 
     private $_dbEntities;
 
+    private $_sessionId;
+
     const CREATE_SESSION_QUERY = 'SELECT * FROM usuarios WHERE (user_id = \'%s\' or user_mail = \'%s\') AND user_status = \'ACTIVE\' and purged != 1 AND user_pass=md5(md5(\'%s\')) ORDER BY user_id LIMIT 1;';
 
     public function __construct(ContainerInterface $container = null)
@@ -97,6 +99,9 @@ class Session
         $this->_dbClient = MysqlClient::getInstance($this->_container, $params);
 
         if ($session = $this->_dbClient->insert($database . '.' . $this->_dbEntities['TABLE_SESSIONS'], $data)) {
+            // Guardamos en memoria el id de la session
+            $this->_setId($data['sess_id']);
+            // Retornamos true o false
             return $session;
         }
     }
@@ -104,5 +109,20 @@ class Session
     public function create($params = [])
     {
         return $this->_create($params);
+    }
+
+    private function _setId($sessionId)
+    {
+        $this->_sessionId = $sessionId;
+    }
+
+    private function _getId()
+    {
+        return $this->_sessionId;
+    }
+
+    public function getId()
+    {
+        return $this->_getId();
     }
 }
