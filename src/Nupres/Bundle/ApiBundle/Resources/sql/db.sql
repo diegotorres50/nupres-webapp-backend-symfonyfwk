@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.21, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.60, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: nupres_dev_demo01
 -- ------------------------------------------------------
--- Server version   5.7.21-0ubuntu0.16.04.1
+-- Server version	5.5.60-0ubuntu0.14.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,6 +14,32 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `circunscripcion_x_boletin`
+--
+
+DROP TABLE IF EXISTS `circunscripcion_x_boletin`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `circunscripcion_x_boletin` (
+  `archivo` varchar(50) NOT NULL,
+  `id_boletin` int(8) NOT NULL,
+  `codigo_circunscripcion` int(8) NOT NULL,
+  `Desc_Circunscripcion` varchar(45) DEFAULT NULL,
+  `Numero_Curules` int(8) DEFAULT NULL,
+  PRIMARY KEY (`archivo`,`id_boletin`,`codigo_circunscripcion`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `circunscripcion_x_boletin`
+--
+
+LOCK TABLES `circunscripcion_x_boletin` WRITE;
+/*!40000 ALTER TABLE `circunscripcion_x_boletin` DISABLE KEYS */;
+/*!40000 ALTER TABLE `circunscripcion_x_boletin` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `diagnosticos`
@@ -39,6 +65,32 @@ CREATE TABLE `diagnosticos` (
 LOCK TABLES `diagnosticos` WRITE;
 /*!40000 ALTER TABLE `diagnosticos` DISABLE KEYS */;
 /*!40000 ALTER TABLE `diagnosticos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `divipol`
+--
+
+DROP TABLE IF EXISTS `divipol`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `divipol` (
+  `codigo_departamento` int(2) DEFAULT NULL,
+  `codigo_municipio` int(3) DEFAULT NULL,
+  `nombre_departamento` varchar(12) DEFAULT NULL,
+  `nombre_municipio` varchar(30) DEFAULT NULL,
+  KEY `idx__codigo_departamento` (`codigo_departamento`),
+  KEY `idx__codigo_municipio` (`codigo_municipio`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `divipol`
+--
+
+LOCK TABLES `divipol` WRITE;
+/*!40000 ALTER TABLE `divipol` DISABLE KEYS */;
+/*!40000 ALTER TABLE `divipol` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -85,45 +137,46 @@ DROP TABLE IF EXISTS `informe_cuidado_critico_general`;
 /*!50001 DROP VIEW IF EXISTS `informe_cuidado_critico_general`*/;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-/*!50001 CREATE VIEW `informe_cuidado_critico_general` AS SELECT
- 1 AS `ingreso_cod`,
- 1 AS `paciente_doc`,
- 1 AS `paciente_nombres`,
- 1 AS `paciente_apellidos`,
- 1 AS `ingreso`,
- 1 AS `dias_ingreso`,
- 1 AS `fecha_mipres`,
- 1 AS `dias_mipres`,
- 1 AS `media_envergadura`,
- 1 AS `altura_rodilla`,
- 1 AS `fecha_egreso`,
- 1 AS `observaciones`,
- 1 AS `estado`,
- 1 AS `seguimiento`,
- 1 AS `motivo_egreso`,
- 1 AS `evolucion_id`,
- 1 AS `formula_kilocalorias_mililitro`,
- 1 AS `formula_proteina_mililitro`,
- 1 AS `ubicacion`,
- 1 AS `cama`,
- 1 AS `nacimiento`,
- 1 AS `edad`,
- 1 AS `sexo`,
- 1 AS `eps`,
- 1 AS `manejo`,
- 1 AS `formula`,
- 1 AS `peso`,
- 1 AS `talla`,
- 1 AS `gasto_energetico_basal`,
- 1 AS `indice_masa_corporal`,
- 1 AS `kilocalorias_kilogramo_peso`,
- 1 AS `meta_calorica`,
- 1 AS `meta_volumen`,
- 1 AS `volumen_infundido`,
- 1 AS `cumplimiento_meta_volumen`,
- 1 AS `gramos_proteina_diaria`,
- 1 AS `gramos_proteina_kg_peso`,
- 1 AS `cumplimiento_meta_calorica`*/;
+/*!50001 CREATE TABLE `informe_cuidado_critico_general` (
+  `ingreso_cod` tinyint NOT NULL,
+  `paciente_doc` tinyint NOT NULL,
+  `paciente_nombres` tinyint NOT NULL,
+  `paciente_apellidos` tinyint NOT NULL,
+  `ingreso` tinyint NOT NULL,
+  `dias_ingreso` tinyint NOT NULL,
+  `fecha_mipres` tinyint NOT NULL,
+  `dias_mipres` tinyint NOT NULL,
+  `media_envergadura` tinyint NOT NULL,
+  `altura_rodilla` tinyint NOT NULL,
+  `fecha_egreso` tinyint NOT NULL,
+  `observaciones` tinyint NOT NULL,
+  `estado` tinyint NOT NULL,
+  `seguimiento` tinyint NOT NULL,
+  `motivo_egreso` tinyint NOT NULL,
+  `evolucion_id` tinyint NOT NULL,
+  `formula_kilocalorias_mililitro` tinyint NOT NULL,
+  `formula_proteina_mililitro` tinyint NOT NULL,
+  `ubicacion` tinyint NOT NULL,
+  `cama` tinyint NOT NULL,
+  `nacimiento` tinyint NOT NULL,
+  `edad` tinyint NOT NULL,
+  `sexo` tinyint NOT NULL,
+  `eps` tinyint NOT NULL,
+  `manejo` tinyint NOT NULL,
+  `formula` tinyint NOT NULL,
+  `peso` tinyint NOT NULL,
+  `talla` tinyint NOT NULL,
+  `gasto_energetico_basal` tinyint NOT NULL,
+  `indice_masa_corporal` tinyint NOT NULL,
+  `kilocalorias_kilogramo_peso` tinyint NOT NULL,
+  `meta_calorica` tinyint NOT NULL,
+  `meta_volumen` tinyint NOT NULL,
+  `volumen_infundido` tinyint NOT NULL,
+  `cumplimiento_meta_volumen` tinyint NOT NULL,
+  `gramos_proteina_diaria` tinyint NOT NULL,
+  `gramos_proteina_kg_peso` tinyint NOT NULL,
+  `cumplimiento_meta_calorica` tinyint NOT NULL
+) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -196,7 +249,7 @@ CREATE TABLE `pacientes` (
 
 LOCK TABLES `pacientes` WRITE;
 /*!40000 ALTER TABLE `pacientes` DISABLE KEYS */;
-INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`, `created_at`, `created_by`, `modified_at`, `modified_by`, `purged`) VALUES (80123858,'Diego Andres','Torres Campuzano','M','1981-06-17',1.68,NULL,NULL,NULL,NULL,'2018-02-03 16:02:26','diegotorres50','\0'),(125434455,'Mariana','Torres','F','2006-09-12',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0');
+INSERT INTO `pacientes` (`id`, `nombres`, `apellidos`, `genero`, `fecha_nacimiento`, `talla`, `media_envergadura`, `altura_rodilla`, `created_at`, `created_by`, `modified_at`, `modified_by`, `purged`) VALUES (12345606,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345607,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345608,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(12345611,'Carla','Gomez','F','1981-06-17',1.68,1.0,'1',NULL,NULL,NULL,NULL,'\0'),(80123858,'Diego','Torres','M','1981-06-17',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0'),(125434455,'Mariana','Torres','F','2006-09-12',1.68,NULL,NULL,NULL,NULL,NULL,NULL,'\0');
 /*!40000 ALTER TABLE `pacientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -208,40 +261,46 @@ DROP TABLE IF EXISTS `pacientes_activos`;
 /*!50001 DROP VIEW IF EXISTS `pacientes_activos`*/;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-/*!50001 CREATE VIEW `pacientes_activos` AS SELECT
- 1 AS `id`,
- 1 AS `nombres`,
- 1 AS `apellidos`,
- 1 AS `genero`,
- 1 AS `fecha_nacimiento`,
- 1 AS `talla`,
- 1 AS `media_envergadura`,
- 1 AS `altura_rodilla`,
- 1 AS `created_at`,
- 1 AS `created_by`,
- 1 AS `modified_at`,
- 1 AS `modified_by`,
- 1 AS `purged`*/;
+/*!50001 CREATE TABLE `pacientes_activos` (
+  `id` tinyint NOT NULL,
+  `nombres` tinyint NOT NULL,
+  `apellidos` tinyint NOT NULL,
+  `genero` tinyint NOT NULL,
+  `fecha_nacimiento` tinyint NOT NULL,
+  `talla` tinyint NOT NULL,
+  `media_envergadura` tinyint NOT NULL,
+  `altura_rodilla` tinyint NOT NULL,
+  `created_at` tinyint NOT NULL,
+  `created_by` tinyint NOT NULL,
+  `modified_at` tinyint NOT NULL,
+  `modified_by` tinyint NOT NULL,
+  `purged` tinyint NOT NULL
+) ENGINE=MyISAM */;
 SET character_set_client = @saved_cs_client;
 
 --
--- Temporary table structure for view `pacientes_activos_basico`
+-- Table structure for table `partidos`
 --
 
-DROP TABLE IF EXISTS `pacientes_activos_basico`;
-/*!50001 DROP VIEW IF EXISTS `pacientes_activos_basico`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `pacientes_activos_basico` AS SELECT
- 1 AS `id`,
- 1 AS `nombres`,
- 1 AS `apellidos`,
- 1 AS `genero`,
- 1 AS `talla`,
- 1 AS `media_envergadura`,
- 1 AS `altura_rodilla`,
- 1 AS `purged`*/;
-SET character_set_client = @saved_cs_client;
+DROP TABLE IF EXISTS `partidos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `partidos` (
+  `codigo` int(3) NOT NULL,
+  `nombre` varchar(200) NOT NULL,
+  PRIMARY KEY (`codigo`),
+  KEY `idx_nombre` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `partidos`
+--
+
+LOCK TABLES `partidos` WRITE;
+/*!40000 ALTER TABLE `partidos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `partidos` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `ref-dx`
@@ -390,6 +449,34 @@ INSERT INTO `ref-ubicaciones` (`id`, `nombre`) VALUES ('HOS','HOSPITALIZACION'),
 UNLOCK TABLES;
 
 --
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sessions` (
+  `sess_id` varchar(128) COLLATE utf8_bin NOT NULL,
+  `sess_data` blob NOT NULL,
+  `sess_time` int(10) unsigned DEFAULT NULL,
+  `sess_lifetime` mediumint(9) DEFAULT NULL,
+  `sess_status` bit(1) NOT NULL DEFAULT b'1',
+  `sess_since` datetime NOT NULL,
+  PRIMARY KEY (`sess_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sessions`
+--
+
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` (`sess_id`, `sess_data`, `sess_time`, `sess_lifetime`, `sess_status`, `sess_since`) VALUES ('a1662e99a3f30dda5d2b19c244d62481','[]',0,0,'','2018-04-27 13:49:02'),('d41d8cd98f00b204e9800998ecf8427e','[]',0,0,'','2018-04-27 13:46:15');
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ubicaciones`
 --
 
@@ -459,7 +546,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` (`user_id`, `user_document`, `user_status`, `user_name`, `user_mail`, `user_pass`, `user_language`, `user_debugger`, `user_secretquestion`, `user_secretanswer`, `user_birthday`, `user_lastactivation`, `user_alloweddays`, `user_photo`, `user_role`, `user_notes`, `user_lastmovementdate`, `user_lastmovementip`, `user_lastmovementwho`, `purged`) VALUES ('alexajs2003','84567234','ACTIVE','Alaxandra Gomez','alexajs2003@gmail.com','14e1b600b1fd579f47433b88e8d85291','es',1,NULL,NULL,NULL,NULL,NULL,NULL,'NONE',NULL,'2018-02-04 18:33:56',NULL,NULL,'\0'),('diegotorres50','85458745','ACTIVE','Diego Torres','diegotorres50@gmail.com','14e1b600b1fd579f47433b88e8d85291','es',1,NULL,NULL,'0000-00-00',NULL,NULL,NULL,'NONE',NULL,'2018-01-25 10:48:12',NULL,NULL,'\0');
+INSERT INTO `usuarios` (`user_id`, `user_document`, `user_status`, `user_name`, `user_mail`, `user_pass`, `user_language`, `user_debugger`, `user_secretquestion`, `user_secretanswer`, `user_birthday`, `user_lastactivation`, `user_alloweddays`, `user_photo`, `user_role`, `user_notes`, `user_lastmovementdate`, `user_lastmovementip`, `user_lastmovementwho`, `purged`) VALUES ('diegotorres50','85458745','ACTIVE','Diego Torres','diegotorres50@gmail.com','14e1b600b1fd579f47433b88e8d85291','es',1,NULL,NULL,'0000-00-00',NULL,NULL,NULL,'NONE',NULL,'2018-01-25 10:48:12',NULL,NULL,'\0');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -517,7 +604,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXCUBRIMIENTOMETACALORICA`(`aporte_kilocalorias_24h` INT, `meta_calorica` INT) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXCUBRIMIENTOMETACALORICA`(`aporte_kilocalorias_24h` INT, `meta_calorica` INT) RETURNS decimal(10,0)
 BEGIN
 
   /* Calcula el cubrimiento porcentual de la meta calorica del paciente */
@@ -541,7 +628,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXCUBRIMIENTOMETAVOLUMEN`(`meta_volumen` INT, `volumen_infundido_24h` INT) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXCUBRIMIENTOMETAVOLUMEN`(`meta_volumen` INT, `volumen_infundido_24h` INT) RETURNS decimal(10,0)
 BEGIN
 
   /* Calcula el cubrimiento porcentual de la meta calorica del paciente */
@@ -565,7 +652,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXGASTOENERGETICOBASAL`(`peso_actual` DECIMAL, `talla` DECIMAL, `edad` INT) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXGASTOENERGETICOBASAL`(`peso_actual` DECIMAL, `talla` DECIMAL, `edad` INT) RETURNS decimal(10,0)
 BEGIN
 
   /* Calcula el gasto energetico basal del paciente*/
@@ -593,7 +680,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXGRAMOSPROTEINADIARIA`(`meta_volumen` int, `proteina_mililitro` decimal(10,3)) RETURNS int(11)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXGRAMOSPROTEINADIARIA`(`meta_volumen` int, `proteina_mililitro` decimal(10,3)) RETURNS int(11)
     DETERMINISTIC
 BEGIN
 
@@ -616,7 +703,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXGRAMOSPROTEINAKGPESO`(`gramos_proteina_diaria` INT, `peso_actual` DECIMAL) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXGRAMOSPROTEINAKGPESO`(`gramos_proteina_diaria` INT, `peso_actual` DECIMAL) RETURNS decimal(10,0)
 BEGIN
 
 /* Calcula los calcula los gramos de proteina por kg de peso del paciente*/
@@ -638,7 +725,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXINDICEMASACORPORAL`(`peso_actual` DECIMAL, `talla` DECIMAL) RETURNS decimal(10,0)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXINDICEMASACORPORAL`(`peso_actual` DECIMAL, `talla` DECIMAL) RETURNS decimal(10,0)
 BEGIN
 
 /* Calcula el indice de masa corporal del paciente*/
@@ -660,7 +747,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `fxKcKgAplicadas`(`kilocalorias_kilogramo_peso` INT, `aporte_kilocalorias_24h` INT) RETURNS int(11)
+CREATE DEFINER=`root`@`localhost` FUNCTION `fxKcKgAplicadas`(`kilocalorias_kilogramo_peso` INT, `aporte_kilocalorias_24h` INT) RETURNS int(11)
 BEGIN
 
 /* Calcula la kilocalorias aplicadas por kilogramo del paciente*/
@@ -682,7 +769,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXMETACALORICA`(`kilocalorias_kilogramo_peso` INT, `peso` DECIMAL) RETURNS int(11)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXMETACALORICA`(`kilocalorias_kilogramo_peso` INT, `peso` DECIMAL) RETURNS int(11)
     DETERMINISTIC
 BEGIN
 
@@ -705,7 +792,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE FUNCTION `FXMETAVOLUMEN`(`kilocalorias_kilogramo_peso` int, `peso` decimal(10,3), `kilocalorias_mililitro` decimal(10,3)) RETURNS int(11)
+CREATE DEFINER=`root`@`localhost` FUNCTION `FXMETAVOLUMEN`(`kilocalorias_kilogramo_peso` int, `peso` decimal(10,3), `kilocalorias_mililitro` decimal(10,3)) RETURNS int(11)
     DETERMINISTIC
 BEGIN
 
@@ -718,67 +805,12 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `procedure_findAll` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE PROCEDURE `procedure_findAll`(IN `_tableName` VARCHAR(28), IN `_databaseName` VARCHAR(28), IN `_search` TEXT, IN `_orderby` VARCHAR(28), IN `_offset` INT(10), IN `_rowcount` SMALLINT(3))
-BEGIN
-DECLARE finished INT DEFAULT FALSE;
-       DECLARE columnName VARCHAR ( 28 ) ;
-       DECLARE stmtFields TEXT ;
-       DECLARE columnNames CURSOR FOR
-              SELECT DISTINCT `COLUMN_NAME` FROM `information_schema`.`COLUMNS`
-              WHERE `TABLE_NAME` = _tableName AND `TABLE_SCHEMA` = _databaseName;
-       DECLARE CONTINUE HANDLER FOR NOT FOUND SET finished = TRUE;
-       SET stmtFields = '' ;
-       OPEN columnNames ;
-       readColumns: LOOP
-              FETCH columnNames INTO columnName ;
-              IF finished THEN
-                     LEAVE readColumns ;
-              END IF;
-              SET stmtFields = CONCAT(
-                     stmtFields , IF ( LENGTH( stmtFields ) > 0 , ' OR' , ''  ) ,
-                     ' `', _tableName ,'`.`' , columnName , '` LIKE "%' , _search , '%"'
-              ) ;
-              #SET stmtFields = "Users.user_id = 'diegotorres50'";
-       END LOOP;
-
-       SET @stmtQueryForDropTable := CONCAT ( 'DROP TEMPORARY TABLE IF EXISTS `TMP_', _tableName,'`;') ;
-       PREPARE stmt FROM @stmtQueryForDropTable ;
-       EXECUTE stmt ;
-
-       SET @stmtQueryForCreateTable := CONCAT ( 'CREATE TEMPORARY TABLE IF NOT EXISTS `TMP_', _tableName,'` AS SELECT * FROM `' , _tableName , '` WHERE ' , stmtFields, ' ORDER BY ' , _orderby , ' LIMIT ' , _offset , ' , ' , _rowcount) ;
-       PREPARE stmt FROM @stmtQueryForCreateTable ;
-       EXECUTE stmt ;
-
-       SET @stmtQueryForDropTotalTable := CONCAT ( 'DROP TEMPORARY TABLE IF EXISTS `COUNT_', _tableName,'`;') ;
-       PREPARE stmt FROM @stmtQueryForDropTotalTable ;
-       EXECUTE stmt ;
-
-       SET @stmtQueryForCountTable := CONCAT ( 'CREATE TEMPORARY TABLE IF NOT EXISTS `COUNT_' , _tableName , '` AS SELECT count(*) as total FROM `' , _tableName , '` WHERE ' , stmtFields) ;
-       PREPARE stmt FROM @stmtQueryForCountTable ;
-       EXECUTE stmt ;
-
-       CLOSE columnNames ;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Final view structure for view `informe_cuidado_critico_general`
 --
 
+/*!50001 DROP TABLE IF EXISTS `informe_cuidado_critico_general`*/;
 /*!50001 DROP VIEW IF EXISTS `informe_cuidado_critico_general`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -797,6 +829,7 @@ DELIMITER ;
 -- Final view structure for view `pacientes_activos`
 --
 
+/*!50001 DROP TABLE IF EXISTS `pacientes_activos`*/;
 /*!50001 DROP VIEW IF EXISTS `pacientes_activos`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -806,25 +839,7 @@ DELIMITER ;
 /*!50001 SET collation_connection      = utf8_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 */
-/*!50001 VIEW `pacientes_activos` AS select `pacientes`.`id` AS `id`,`pacientes`.`nombres` AS `nombres`,`pacientes`.`apellidos` AS `apellidos`,`pacientes`.`genero` AS `genero`,`pacientes`.`fecha_nacimiento` AS `fecha_nacimiento`,`pacientes`.`talla` AS `talla`,`pacientes`.`media_envergadura` AS `media_envergadura`,`pacientes`.`altura_rodilla` AS `altura_rodilla`,`pacientes`.`created_at` AS `created_at`,`pacientes`.`created_by` AS `created_by`,`pacientes`.`modified_at` AS `modified_at`,`pacientes`.`modified_by` AS `modified_by`,`pacientes`.`purged` AS `purged` from `pacientes` where (`pacientes`.`purged` <> 1) order by `pacientes`.`apellidos` */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `pacientes_activos_basico`
---
-
-/*!50001 DROP VIEW IF EXISTS `pacientes_activos_basico`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 */
-/*!50001 VIEW `pacientes_activos_basico` AS select `pacientes`.`id` AS `id`,`pacientes`.`nombres` AS `nombres`,`pacientes`.`apellidos` AS `apellidos`,`pacientes`.`genero` AS `genero`,`pacientes`.`talla` AS `talla`,`pacientes`.`media_envergadura` AS `media_envergadura`,`pacientes`.`altura_rodilla` AS `altura_rodilla`,`pacientes`.`purged` AS `purged` from `pacientes` where (`pacientes`.`purged` <> 1) order by `pacientes`.`apellidos` */;
+/*!50001 VIEW `pacientes_activos` AS select `pacientes`.`id` AS `id`,`pacientes`.`nombres` AS `nombres`,`pacientes`.`apellidos` AS `apellidos`,`pacientes`.`genero` AS `genero`,`pacientes`.`fecha_nacimiento` AS `fecha_nacimiento`,`pacientes`.`talla` AS `talla`,`pacientes`.`media_envergadura` AS `media_envergadura`,`pacientes`.`altura_rodilla` AS `altura_rodilla`,`pacientes`.`created_at` AS `created_at`,`pacientes`.`created_by` AS `created_by`,`pacientes`.`modified_at` AS `modified_at`,`pacientes`.`modified_by` AS `modified_by`,`pacientes`.`purged` AS `purged` from `pacientes` where (`pacientes`.`purged` = 0) order by `pacientes`.`created_at` desc */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -838,4 +853,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-04 18:36:33
+-- Dump completed on 2018-04-27 14:21:59

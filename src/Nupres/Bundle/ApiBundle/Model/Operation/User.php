@@ -68,6 +68,16 @@ class User
         return $this->getDataFromUserhash()->username;
     }
 
+    private function _getSessionId()
+    {
+        return $this->getDataFromUserhash()->session_id;
+    }
+
+    private function getSessionId()
+    {
+        return $this->_getSessionId();
+    }
+
     public function getDbName()
     {
         return $this->_getDbName();
@@ -106,7 +116,13 @@ class User
 
     private function _getDataFromSession()
     {
-        return $this->_session->get($this->_getDbName() . '.' . $this->_getUsername());
+        // Invocamos el servicio de sessions que hicimos a pedal.
+        $sessionService = $this->_container->get('nupres.session.service');
+
+        $sessionService->setDbAlias($this->_getDbName());
+
+        //Retornamos informacion de la data en session
+        return ($sessionService->get($this->_getSessionId()));
     }
 
     public function getDataFromSession()
