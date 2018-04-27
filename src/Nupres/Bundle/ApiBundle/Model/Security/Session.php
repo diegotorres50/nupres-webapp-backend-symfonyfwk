@@ -17,7 +17,9 @@ class Session
 
     private $_sessionId;
 
-    const CREATE_SESSION_QUERY = 'SELECT * FROM usuarios WHERE (user_id = \'%s\' or user_mail = \'%s\') AND user_status = \'ACTIVE\' and purged != 1 AND user_pass=md5(md5(\'%s\')) ORDER BY user_id LIMIT 1;';
+    private $_dbAlias;
+
+    const FIND_SESSION_QUERY = 'SELECT sess_data FROM sessions WHERE (sess_id = \'%s\') ORDER BY sess_id LIMIT 1;';
 
     public function __construct(ContainerInterface $container = null)
     {
@@ -46,7 +48,7 @@ class Session
         }
     }
 
-    private function _create($params = [])
+    private function _create($username, $data = [])
     {
         //$params['database'] debe venir aqui sino no se puede conectar el servicio que estamos creando
 
@@ -79,41 +81,78 @@ class Session
         // Escribiendo log en modo debugger
         $debugger::debugger('PARAMETERS', $params);
 
-        $data = array(
-            'sess_id'       => md5($params['username']),
-            'sess_data'     => json_encode($params['data']),
-            'sess_since'    => date("Y-m-d H:i:s")
-        );
-
-        // Escribiendo log en modo debugger
-        $debugger::debugger('DATA', $data);
-
-        $factoriesMapService = $this->_container->get('nupres.factories_map.service');
-        $factoriesMap = $factoriesMapService::getFactoriesMap();
-
-        $database = $factoriesMap[strtoupper($params['database'])];
+        $database = $this->_getDbName();
 
         // Escribiendo log en modo debugger
         $debugger::debugger('DATABASE: '. $database);
 
-        $this->_dbClient = MysqlClient::getInstance($this->_container, $params);
+        // Para completar la darta que quetemos guardar en la sesion
+        $_data = array (
+            'session_id'    => md5($username),
+            'database'      => $this->_getDbAlias(),
+            'username'      => $username,
+            'time'          => time()
+        );
 
-        if ($session = $this->_dbClient->insert($database . '.' . $this->_dbEntities['TABLE_SESSIONS'], $data)) {
-            // Guardamos en memoria el id de la session
-            $this->_setId($data['sess_id']);
+        $sessData = array(
+            'sess_id'       => md5($username),
+            'sess_data'     => json_encode(array_merge($data, $_data)),
+            'sess_since'    => date("Y-m-d H:i:s")
+        );
+
+        // Guardamos en memoria el id de la session
+        $this->_setId($sessData['sess_id']);
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('SESS_DATA', $sessData);
+
+        $this->_dbClient = MysqlClient::getInstance($this->_container, ['database' => $database]);
+
+        //Si la session ya existe la borramos
+        $this->_delete();
+
+        if ($session = $this->_dbClient->insert($database . '.' . $this->_dbEntities['TABLE_SESSIONS'], $sessData)) {
             // Retornamos true o false
             return $session;
         }
     }
 
-    public function create($params = [])
+    public function create($username, $data = [])
     {
-        return $this->_create($params);
+        return $this->_create($username, $data);
     }
 
     private function _setId($sessionId)
     {
         $this->_sessionId = $sessionId;
+    }
+
+    public function setId($sessionId)
+    {
+        $this->_setId($sessionId);
+    }
+
+    private function _setDbAlias($alias)
+    {
+        $this->_dbAlias = $alias;
+    }
+
+    private function _getDbAlias()
+    {
+        return $this->_dbAlias;
+    }
+
+    private function _getDbName()
+    {
+        $factoriesMapService = $this->_container->get('nupres.factories_map.service');
+        $factoriesMap = $factoriesMapService::getFactoriesMap();
+
+        return $factoriesMap[strtoupper($this->_getDbAlias())];
+    }
+
+    public function setDbAlias($alias)
+    {
+        $this->_setDbAlias($alias);
     }
 
     private function _getId()
@@ -124,5 +163,103 @@ class Session
     public function getId()
     {
         return $this->_getId();
+    }
+
+    private function _delete()
+    {
+        $this->_dbClient = MysqlClient::getInstance($this->_container, ['database' => $this->_getDbName()]);
+        // Funciona despues de usar create() porque alli se guarda el cliente de la bd
+        $this->_dbClient->where('sess_id', $this->_getId());
+        return $this->_dbClient->delete($this->_dbEntities['TABLE_SESSIONS']);
+    }
+
+    private function _exists($sessionId)
+    {
+        // Servicio para imprimir debugger
+        $debugger = $this->_debugger;
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'GENERAL INFO',
+            array(
+                'CLASS'     => __CLASS__,
+                'FILE'      => __FILE__,
+                'METHOD'    => __METHOD__,
+                'LINE'      => __LINE__
+            )
+        );
+
+
+        $database = $this->_getDbName();
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('DATABASE: '. $database);
+
+        try {
+            $this->_dbClient = MysqlClient::getInstance($this->_container, ['database' => $database]);
+        } catch (\Exception $ex) {
+            // Hagamos debugger aqui
+            return false;
+        }
+
+        // Retornamos un boolean
+        return boolval($this->_dbClient->rawQuery(
+            sprintf(
+                self::FIND_SESSION_QUERY,
+                $sessionId
+            )
+        ));
+    }
+
+    public function exists($sessionId)
+    {
+        return $this->_exists($sessionId);
+    }
+
+    public function close()
+    {
+        return $this->_delete();
+    }
+
+    private function _getData($sessionId)
+    {
+        // Servicio para imprimir debugger
+        $debugger = $this->_debugger;
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger(
+            'GENERAL INFO',
+            array(
+                'CLASS'     => __CLASS__,
+                'FILE'      => __FILE__,
+                'METHOD'    => __METHOD__,
+                'LINE'      => __LINE__
+            )
+        );
+
+        $database = $this->_getDbName();
+
+        // Escribiendo log en modo debugger
+        $debugger::debugger('DATABASE: '. $database);
+
+        try {
+            $this->_dbClient = MysqlClient::getInstance($this->_container, ['database' => $database]);
+        } catch (\Exception $ex) {
+            // Hagamos debugger aqui
+            return false;
+        }
+
+        // Retornamos los datos encontrados
+        return json_decode($this->_dbClient->rawQuery(
+            sprintf(
+                self::FIND_SESSION_QUERY,
+                $sessionId
+            )
+        )['0']['sess_data'], true);
+    }
+
+    public function get($sessionId)
+    {
+        return $this->_getData($sessionId);
     }
 }

@@ -101,41 +101,28 @@ class SecurityController extends Controller
                 parecer no quedan con permisos de escritura lo que ocasiona que no se guarde
                 la informacion de la sesion y cuando esto pasa... otras apis como por ejemplo
                 isloggedin desde el controlador o desde el auth model tratan de recuperar los datos de la sesion por una key y pues no encuentran datos, toca seguir
-                investigando, por el momento no voy a usar las sessions de php, solo
-                nos basaremos en el token jwt que se entregue al cliente y desde el cliente
-                persistir esta info que era lo que en principio queria que hiciera php, nos toca asi para poder seguir avanzando el front desde angular.
-                 */
-                /*
-                //Si la sesion ya existe, no mostramos el formulario de login
-                if ($request->getSession()->has($database . '.' . $username) &&
-                    !empty($request->getSession()->has($database . '.' . $username))) {
-                    // FIXME Aqui debo hacer un clear o logout de la session para invalidar la session actual
-                    //$request->getSession()->clear();
-                } else {
-                    // Creamos la session
-                    $session=$request->getSession();
-                    // Creamos una llave valor para identificar la sesion de manera unica
-                    // y guardamos mas data
-                    $session->set(
-                        $database . '.' . $username,
-                        array(
-                            'user_info' => $userData,
-                            'database'  => $database
-                        )
-                    );
-                }*/
+                investigando, por el momento no voy a usar las sessions de php
 
-                // Invocamos el servicio de sessions que hicimos a pedal porque
-                // con symfony no se estan persistiendo las sessiones en files
+                Usare un modelo session custom que gestione la info de la sesion del usuario.
+                 */
+
+                // Invocamos el servicio de sessions que hicimos a pedal.
                 $sessionService = $this->container->get('nupres.session.service');
 
+                // Preparamos la data que queremos guardar al crear la session
                 $params['data'] = array(
-                                    'user_info' => $userData,
-                                    'database'  => $database
+                                    'extra' => $userData
                                 );
 
-                // Tratamos de crear la session
-                $sessionService->create($params);
+                // Tratamos de crear la session, si ya existe una session, este metodo
+                // borra esa session y crea una nueva.
+                // el create necesita como minimo el dato del nombre de la base de datos (alias)
+                // para que el servicio levante las conexiones a mysql para persistir
+                // las sessiones.
+                //
+                // @TODO este create debe estar dentro del login del modelo auth y que ahi se encargue de todo esta parte
+                $sessionService->setDbAlias($database); // Las sessiones pertenecen a una bd
+                $sessionService->create($username, $params['data']);
 
                 // Creamos un userhash encriptado para re usarlo en todas las apis que requieran autenticar el usuario para verificar si tiene session activa
                 $userHash = $jwTokenService::encode(
@@ -257,12 +244,8 @@ class SecurityController extends Controller
             */
             // Validamos si el usuario tiene session activa
             if ($authService->isLoggedIn($userhash)) {
-                //Cerramos ahora la sesion en el navegador
-                //$request->getSession()->clear();
-                //
-                //@TODO @FIXME lo ideal seria que invalidaramos el jwt
-                //que los que usaremos por ahora mientras resolvemos
-                //el problema de las sesiones en php
+                //Cerramos ahora la sesion registrada
+                $authService->logout($userhash);
             } else {
                 throw new \Exception("El usuario no esta loggeado");
             }
@@ -369,12 +352,11 @@ class SecurityController extends Controller
                  parecer no quedan con permisos de escritura lo que ocasiona que no se guarde
                  la informacion de la sesion y cuando esto pasa... otras apis como por ejemplo
                  isloggedin desde el controlador o desde el auth model tratan de recuperar los datos de la sesion por una key y pues no encuentran datos, toca seguir
-                 investigando, por el momento no voy a usar las sessions de php, solo
-                 nos basaremos en el token jwt que se entregue al cliente y desde el cliente
-                 persistir esta info que era lo que en principio queria que hiciera php, nos toca asi para poder seguir avanzando el front desde angular.
+                 investigando, por el momento no voy a usar las sessions de php.
                 */
+
                 // Obtenemos del objeto usuario la info que tenemos en sesion
-                /*$userData = $userService->getDataFromSession();
+                $userData = $userService->getDataFromSession();
 
                 // Invocamos el servicio del jwt
                 $jwTokenService = $this->container->get('nupres.jwt.service');
@@ -385,8 +367,7 @@ class SecurityController extends Controller
                         $userData,
                         array('time' => time()) // time() es para cambiar el token
                     )
-                );*/
-                $data = $userhash;
+                );
             } else {
                 throw new \Exception("El usuario no esta autenticado");
             }
