@@ -39,4 +39,7 @@
   <route id="nupres_api_config" path="/utils/config/getall">
     <default key="_controller">NupresApiBundle:Config:getAll</default>
   </route>
+  <route id="nupres_api_user_add" path="/user/add">
+    <default key="_controller">NupresApiBundle:User:add</default>
+  </route>
 </routes>

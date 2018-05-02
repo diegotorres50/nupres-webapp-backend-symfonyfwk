@@ -8,6 +8,7 @@ namespace Nupres\Bundle\ApiBundle\Entity;
 
 class Entities
 {
+    const TABLE_USUARIOS                = 'usuarios';
     const TABLE_PACIENTES               = 'pacientes';
     const TABLE_SESSIONS                = 'sessions';
     const VIEW_PACIENTES_ACTIVOS        = 'pacientes_activos';
